@@ -1,3 +1,5 @@
 tests/testlex.exe
+tests/testlex
+nimlua
 nimlua.exe
 log.txt
