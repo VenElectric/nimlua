@@ -100,3 +100,17 @@ Proident quis ex dolore id sint pariatur anim laboris nulla irure ad dolor."""
         for tok in getToken(lex):
             writeLine(outFile, fmt"Token: {tok.kind} | Lexeme: {tok.lexeme}")
             check(tok.kind != TK_ERROR)
+    
+    test "Keywords":
+        var lex = initWithFile("tests/lua/keywords.lua")
+
+        checkpoint("Success with initializing lexer")
+
+        let outFile = open("log.txt", fmAppend)
+
+        #var idx = 0
+
+
+        for tok in getToken(lex):
+            writeLine(outFile, fmt"Token: {tok.kind} | Lexeme: {tok.lexeme}")
+            check(tok.kind != TK_ERROR)
