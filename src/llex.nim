@@ -14,7 +14,7 @@ const
 
 
 type
-    TokenKind = enum
+    TokenKind* = enum
         TK_AND = "and"
         TK_BREAK = "break"
         TK_DO = "do"
@@ -78,8 +78,8 @@ type
         r*: lua_Number
         ts*: TString
     Token = object
-        token: TokenKind
-        seminfo: SemInfo
+        kind*: TokenKind
+        lexeme*: string
     LexState = object of BaseLexer
         lastline: int
         t: Token
@@ -170,6 +170,9 @@ proc newString(ls: var LexState) =
     resetLexeme(ls)
 
 proc readLongString(ls: var LexState) =
+    # skip [[
+    advance(ls)
+    advance(ls)
     saveAndNext(ls)
     while peek() != ']':
         if isEOF(ls):
@@ -179,8 +182,6 @@ proc readLongString(ls: var LexState) =
     if peek() != ']':
         syntax_error("Invalid long string delimiter", TK_STRING)
     advance(ls)
-
-    newString(ls)
 
 proc isReserved(ls: var LexState): bool =
     result = false
@@ -247,12 +248,12 @@ proc readVar(ls: var LexState) =
 template TTM(ch: char, tCond: TokenKind, fCond: TokenKind) =
     advance(ls)
     if match(ls, ch):
-        yield(tCond)
+        yield(Token(kind:tCond, lexeme: $tCond))
     else:
-        yield(fCond)
+        yield(Token(kind:fCond, lexeme: $fCond))
         continue
 
-iterator getToken*(ls: var LexState): TokenKind =
+iterator getToken*(ls: var LexState): Token =
     while not isEOF(ls):
         case peek():
             
@@ -262,26 +263,22 @@ iterator getToken*(ls: var LexState): TokenKind =
                 if match(ls, '-'):
                     if peek() == '[' and peekNext() == '[':
                         discard skipLongComment(ls)
-                        yield(TK_COMMENT)
+                        yield(Token(kind:TK_COMMENT,lexeme:"comment"))
                     else:
                         skipComment(ls)
-                        yield(TK_COMMENT)
+                        yield(Token(kind:TK_COMMENT,lexeme:"comment"))
 
                 else:
-                    yield(TK_MINUS)
+                    yield(Token(kind:TK_MINUS,lexeme: $TK_MINUS))
             of '[':
                 if peekNext() == '[':
                     readLongString(ls)
-                    yield(TK_STRING)
+                    yield(Token(kind:TK_STRING,lexeme:ls.lexeme))
                     resetLexeme(ls)
-                    continue
                 else:
-                    yield(TK_LEFTSTAPLE)
-
+                    yield(Token(kind:TK_LEFTSTAPLE,lexeme: $TK_LEFTSTAPLE))
             of ']':
-                yield(TK_RIGHTSTAPLE)
-
-
+                yield(Token(kind:TK_RIGHTSTAPLE,lexeme: $TK_RIGHTSTAPLE))
             of '=': TTM('=', TK_EQEQ, TK_EQ)
             of '<': TTM('=', TK_LE, TK_LESS)
             of '>': TTM('=', TK_GE, TK_GREATER)
@@ -289,54 +286,55 @@ iterator getToken*(ls: var LexState): TokenKind =
             of ':': TTM(':', TK_DBCOLON, TK_COLON)
             of '"', '\'':
                 readString(ls)
-                yield(TK_STRING)
+                yield(Token(kind:TK_STRING,lexeme:ls.lexeme))
                 resetLexeme(ls)
+                continue
 
             of Digits:
                 readNumeral(ls)
-                yield(TK_NUMBER)
+                yield(Token(kind:TK_NUMBER,lexeme:ls.lexeme))
                 resetLexeme(ls)
+                continue
             of '.':
                 advance(ls)
                 if match(ls, '.'):
                     if peekNext() == '.':
-                        yield(TK_DOTS)
+                         yield(Token(kind:TK_DOTS,lexeme: $TK_DOTS))
                     else:
-                        yield(TK_CONCAT)
+                       yield(Token(kind:TK_CONCAT,lexeme: $TK_CONCAT))
                 else:
-                    yield(TK_DOT)
+                     yield(Token(kind:TK_DOT,lexeme: $TK_DOT))
                 continue
-            of '+': yield(TK_PLUS)
-            of '*': yield(TK_STAR)
-            of '/': yield(TK_SLASH)
-            of '(': yield(TK_LEFTPAREN)
-            of ')': yield(TK_RIGHTPAREN)
-            of '{': yield(TK_LEFTBRACKET)
-            of '}': yield(TK_RIGHTBRACKET)
-            of ';': yield(TK_SEMCOL)
-            of '%': yield(TK_MOD)
-            of '#': yield(TK_HASH)
-            of ',': yield(TK_COMMA)
-            of '^': yield(TK_CARROT)
+            of '+':  yield(Token(kind:TK_PLUS,lexeme: $TK_PLUS))
+            of '*':  yield(Token(kind:TK_STAR,lexeme: $TK_STAR))
+            of '/':  yield(Token(kind:TK_SLASH,lexeme: $TK_SLASH))
+            of '(': yield(Token(kind:TK_LEFTPAREN,lexeme: $TK_LEFTPAREN))
+            of ')': yield(Token(kind:TK_RIGHTPAREN,lexeme: $TK_RIGHTPAREN))
+            of '{': yield(Token(kind:TK_LEFTBRACKET,lexeme: $TK_LEFTBRACKET))
+            of '}': yield(Token(kind:TK_RIGHTBRACKET,lexeme: $TK_RIGHTBRACKET))
+            of ';': yield(Token(kind:TK_SEMCOL,lexeme: $TK_SEMCOL))
+            of '%': yield(Token(kind:TK_MOD,lexeme: $TK_MOD))
+            of '#': yield(Token(kind:TK_HASH,lexeme: $TK_HASH))
+            of ',': yield(Token(kind:TK_COMMA,lexeme: $TK_COMMA))
+            of '^': yield(Token(kind:TK_CARROT,lexeme: $TK_CARROT))
             else:
                 if peek() in IdentChars:
                     readVar(ls)
-                    echo "Lex: ", ls.lexeme
                     if isReserved(ls):
-                        yield(getReserved(ls))
+                        yield(Token(kind:getReserved(ls),lexeme:ls.lexeme))
                     else:
-                        yield(TK_NAME)
+                        yield(Token(kind:TK_NAME,lexeme:ls.lexeme))
                     resetLexeme(ls)
                     continue
                 else:
-                    yield(TK_ERROR)
+                    yield(Token(kind:TK_ERROR,lexeme:"error"))
         advance(ls)
 
 proc initLex*() =
     var ls = initWithFile("test.lua")
     for tk in getToken(ls):
         echo tk
-        if tk == TK_ERROR:
+        if tk.kind == TK_ERROR:
             break
 
 proc llex(ls: var LexState) =
