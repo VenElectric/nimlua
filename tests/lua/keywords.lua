@@ -5,7 +5,8 @@ while true do
         break
     end
 end
-
+-- \r\n
+-- \n\r
 do
     print("Hello World")
 end

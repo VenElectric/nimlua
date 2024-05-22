@@ -2,6 +2,8 @@ import std/[unittest, strformat]
 from std/strutils import strip
 import ../src/llex
 
+const MAX_ITER = 50000
+
 suite "Tests for the Lexer":
     echo "Running lex tests"
 
@@ -94,10 +96,13 @@ Proident quis ex dolore id sint pariatur anim laboris nulla irure ad dolor."""
 
         let outFile = open("log.txt", fmAppend)
 
-        #var idx = 0
+        var idx = 0
 
 
         for tok in getToken(lex):
+            inc(idx)
+            if idx > MAX_ITER:
+                break
             writeLine(outFile, fmt"Token: {tok.kind} | Lexeme: {tok.lexeme}")
             check(tok.kind != TK_ERROR)
     
@@ -108,9 +113,29 @@ Proident quis ex dolore id sint pariatur anim laboris nulla irure ad dolor."""
 
         let outFile = open("log.txt", fmAppend)
 
-        #var idx = 0
+        var idx = 0
 
 
         for tok in getToken(lex):
+            inc(idx)
+            if idx > MAX_ITER:
+                break
+            writeLine(outFile, fmt"Token: {tok.kind} | Lexeme: {tok.lexeme}")
+            check(tok.kind != TK_ERROR)
+    
+    test "Numbers":
+        var lex = initWithFile("tests/lua/numbers.lua")
+
+        checkpoint("Success with initializing lexer")
+
+        let outFile = open("log.txt", fmAppend)
+
+        var idx = 0
+
+
+        for tok in getToken(lex):
+            inc(idx)
+            if idx > MAX_ITER:
+                break
             writeLine(outFile, fmt"Token: {tok.kind} | Lexeme: {tok.lexeme}")
             check(tok.kind != TK_ERROR)
