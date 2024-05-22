@@ -1,7 +1,6 @@
 import std/[lexbase, streams]
 from strutils import Digits, Letters, IdentChars
 import types, llimits
-from lua import ThreadStatus
 
 const
     FIRST_RESERVED = 257
@@ -94,7 +93,7 @@ type
         decpoint: char
     SyntaxError = object of CatchableError
 
-const NewLineChars = {'\r','\n','\l'}
+const NewLineChars = {'\r','\n','\c'}
 const WhiteSpaceChars = {' ','\t','\f','\v'}
 const NotationChars = {'e','x','.'}
 
@@ -122,15 +121,19 @@ proc advance(ls: var LexState) =
     if (isEof(ls)): return
     inc(ls.bufpos)
 
-proc handleNewline(ls: var LexState) =
-    let ch = peek()
-    assert(isNewline(ls))
-    advance(ls)
-    inc(ls.lineNumber)
-    if isNewline(ls) and peek() != ch:
-        advance(ls)
+# proc handleNewline(ls: var LexState) =
+#     let ch = peek()
+#     assert(isNewline(ls))
+#     advance(ls)
+#     inc(ls.lineNumber)
+#     if isNewline(ls) and peek() != ch:
+#         advance(ls)
             
-
+proc handleNewline(ls: var LexState) = 
+    case peek():
+        of '\c': ls.bufpos = ls.handleCR(ls.bufpos)
+        of '\n': ls.bufpos = ls.handleLF(ls.bufpos)
+        else: discard
 
 proc match(ls: var LexState, ch: char): bool =
     result = false
@@ -229,8 +232,8 @@ proc readNumeral(ls: var LexState) =
     # how to handle
     # countries that don't use '.'
     # potentially get entire lexeme before doing checks on whether ',' or '.'
-    while peek() in Digits + {'.','x','e'}:
-        if unlikely(peek() in {'.','x','e'} and not(peekNext() in Digits)):
+    while peek() in Digits + NotationChars:
+        if unlikely(peek() in NotationChars and not(peekNext() in Digits)):
             case peek():
                 of '.':
                     syntax_error("Invalid decimal placement for decimal number", TK_NUMBER)

@@ -79,6 +79,7 @@ Proident quis ex dolore id sint pariatur anim laboris nulla irure ad dolor."""
         lex = initWithString(long_str_two)
         for tok in getToken(lex):
             if tok.kind == TK_STRING:
+                echo tok.lexeme
                 check(len(tok.lexeme) == long_str_two_len)
         checkpoint("Finished Long String Two")
 
