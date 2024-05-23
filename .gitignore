@@ -3,3 +3,4 @@ tests/testlex
 nimlua
 nimlua.exe
 log.txt
+src/lua54/testfiles

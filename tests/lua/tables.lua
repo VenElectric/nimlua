@@ -12,5 +12,5 @@ table.insert(x,5)
 table.insert(x,90)
 
 
-y["z"] = 33
-y['b'] = 44
+y["tab1"] = 33
+y['tab2'] = 44

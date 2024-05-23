@@ -27,7 +27,7 @@ type
         LUA_ERRMEM = 4
         LUA_ERRGCMM = 5
         LUA_ERRERR = 6
-    lua_State = distinct pointer
+    lua_State* = distinct pointer
     lua_CFunction = proc(L:lua_State):int
     lua_Reader = proc(l:lua_State,sz:int,ud:auto):string
     lua_Writer = proc(l:lua_State,p:pointer,sz:int,ud:auto):int
