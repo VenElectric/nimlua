@@ -2,7 +2,7 @@ import std/[lexbase, strformat]
 from streams import newStringStream
 from parseutils import skipUntil,parseWhile,parseUntil
 from strutils import Digits, IdentChars, Letters
-import types, llimits
+import types
 
 const
     FIRST_RESERVED = 257
@@ -10,8 +10,7 @@ const
     "for", "function", "goto", "if", "in", "local", "nil", "not", "or",
     "repeat",
     "return", "then", "true", "until", "while",
-    "..", "...", "==", ">=", "<=", "~=", "::", "<eof>",
-    "<number>", "<name>", "<string>"]
+    "..", "...", "==", ">=", "<=", "~=", "::"]
 
 
 type
@@ -75,9 +74,6 @@ type
 # let NUM_RESERVED = int(TK_WHILE) - (FIRST_RESERVED + 1)
 
 type
-    SemInfo = object
-        r*: lua_Number
-        ts*: TString
     Token* = object
         kind*: TokenKind
         lexeme*: string
