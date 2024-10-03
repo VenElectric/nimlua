@@ -81,15 +81,14 @@ type
     LexState* = object of BaseLexer
         lastline: int
         curtoken: Token
-        lexeme: string
         lookahead: Token
+        lexeme: string
         fs: FuncState
         L: lua_State
-        dyd: Dyndata
-        source: TString
-        envn: TString
-        decpoint: char
     SyntaxError = object of CatchableError
+
+using
+    ls: var LexState
 
 const NewLineChars = {'\r', '\n', '\c'}
 const WhiteSpaceChars = {' ', '\t', '\f', '\v'}
@@ -148,6 +147,8 @@ func createNumberToken(ls: LexState): Token = result = createToken(ls,
 func createCommentToken(ls: LexState): Token = result = createToken(ls,
         TK_COMMENT, "comment")
 
+func createEOFToken(ls:LexState): Token = result = createToken(ls,TK_EOS,"eof")
+
 proc initWithString*(contents: string): LexState =
     result = LexState()
     result.lineNumber = 1
@@ -178,7 +179,7 @@ proc handleNewline(ls: var LexState) =
         of '\n': ls.bufpos = ls.handleLF(ls.bufpos)
         else: discard
 
-proc match(ls: var LexState, ch: char): bool =
+proc match(ls; ch: char): bool =
     result = false
     if peek() == ch:
         advance(ls)
@@ -199,8 +200,10 @@ proc saveUntil(ls: var LexState, ch: char): int = result = parseUntil(ls.buf,
 proc saveUntil(ls: var LexState, chars: set[char]): int = result = parseUntil(
         ls.buf, ls.lexeme, chars, ls.bufpos)
 
-proc saveWhile(ls: var LexState, chars: set[char]): int = parseWhile(ls.buf,
+proc saveWhile(ls; chars: set[char]): int = result = parseWhile(ls.buf,
         ls.lexeme, chars, ls.bufpos)
+
+proc saveWhile(ls; sink:var string, chars: set[char]): int = result = parseWhile(ls.buf,sink, chars, ls.bufpos)
 
 proc skipComment(ls: var LexState) = skipByChars(ls, NewLineChars)
 
@@ -218,40 +221,40 @@ proc readLongString(ls: var LexState) =
     let saved = saveUntil(ls, ']')
     advance(ls, saved)
     if saved == 0 or isEOF(ls):
-        syntax_error("Unfinished long string", TK_STRING, ls.lineNumber)
+        syntax_error("Unterminated long string", TK_STRING, ls.lineNumber)
     advance(ls)
     if peek() != ']':
         syntax_error("Long string not terminated by ]]", TK_STRING, ls.lineNumber)
     advance(ls)
 
-proc isReserved(ls: var LexState): bool =
+proc isReserved(ls): bool =
     result = false
     if ls.lexeme in luaX_tokens:
         result = true
 
 
-proc readString(ls: var LexState) =
+proc readString(ls) =
     advance(ls)
     let saved = saveUntil(ls, {'"', '\''})
     advance(ls, saved)
     if saved == 0 or isEOF(ls):
-        syntax_error("Unfinished string", TK_STRING, ls.lineNumber)
+        syntax_error("Unterminated string", TK_STRING, ls.lineNumber)
         # escape sequence handling later
     advance(ls)
 
 
-proc readNumeral(ls: var LexState) =
+proc readNumeral(ls) =
     # how to handle
     # countries that don't use '.'
     # potentially get entire lexeme before doing checks on whether ',' or '.'
     var str: string
-    let saved = parseWhile(ls.buf, str, Digits, ls.bufpos)
+    let saved = saveWhile(ls,str, Digits)
     add(ls.lexeme, str)
     advance(ls, saved)
     if peek() in NotationChars and peekNext() in Digits:
         add(ls.lexeme, peek())
         var afterStr: string
-        let savedAfter = parseWhile(ls.buf, afterStr, Digits, ls.bufpos)
+        let savedAfter = saveWhile(ls,afterStr, Digits)
         advance(ls, savedAfter)
         add(ls.lexeme, afterStr)
     else:
@@ -371,8 +374,12 @@ proc getToken*(ls: var LexState): Token =
 
 
 proc lua_next*(ls:var LexState) = 
-    ls.lastline = ls.lineNumber
-    ls.curtoken = getToken(ls)
+    if unlikely(isEOF(ls)): 
+        ls.curtoken = createEOFToken(ls)
+        ls.close()
+    else:
+        ls.lastline = ls.lineNumber
+        ls.curtoken = getToken(ls)
 
 
 

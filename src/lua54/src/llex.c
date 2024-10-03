@@ -355,13 +355,13 @@ static void read_string (LexState *ls, int del, SemInfo *seminfo) {
         int c;  /* final character to be saved */
         next(ls);  /* do not save the `\' */
         switch (ls->current) {
-          case 'a': c = '\a'; goto read_save;
+          case 'a': c = 7; goto read_save;
           case 'b': c = '\b'; goto read_save;
           case 'f': c = '\f'; goto read_save;
           case 'n': c = '\n'; goto read_save;
           case 'r': c = '\r'; goto read_save;
           case 't': c = '\t'; goto read_save;
-          case 'v': c = '\v'; goto read_save;
+          case 'v': c = 11; goto read_save;
           case 'x': c = readhexaesc(ls); goto read_save;
           case '\n': case '\r':
             inclinenumber(ls); c = '\n'; goto only_save;
@@ -406,7 +406,7 @@ static int llex (LexState *ls, SemInfo *seminfo) {
         inclinenumber(ls);
         break;
       }
-      case ' ': case '\f': case '\t': case '\v': {  /* spaces */
+      case ' ': case '\f': case '\t': case 11: {  /* spaces */
         next(ls);
         break;
       }
