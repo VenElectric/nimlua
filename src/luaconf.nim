@@ -1,13 +1,11 @@
-import std/distros
 
 
-when sizeof(int) >= 32:
-    const LUAI_BITSINT = 32
-elif sizeof(int) < 17:
-    const LUAI_BITSINT = 16
+
+when defined(windows):
+    import private/confwindows
+    export confwindows
 else:
-    throw newException(CatchableError,"bleh")
+    import private/confposix
+    export confposix
 
-if detectOs(Windows):
-    const LUA_LDIR = "!\\lua\\"
-    const LUA_CDIR = "!\\"
+const LUA_ENV* = "_ENV"
