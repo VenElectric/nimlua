@@ -1,34 +1,4 @@
-
-type 
-    StringTable* = object 
-        hash: GCObject
-        nuse: uint32
-        size: int
-    GCObject* = object #placeholder
-    CallInfo* =  object #placeholder
-    GlobalState* = object #placeholder
-    LuaState* = object 
-        # CommonHeader;
-        status*: uint8
-        # StkId top
-        LG*: GlobalState
-        CI*: CallInfo
-        oldPC*: uint32
-        # stkId stack_last;  /* last free slot in the stack */
-        #StkId stack; 
-        stacksize*: int
-        nny*: uint16
-        nCcalls*: uint16
-        hookmask*: uint8
-        allowhook*: uint8
-        basehookcount*: int
-        hookcount*: int
-        # lua_Hook hook;
-        openupval*: ptr GCObject
-        gclist*: ptr GCObject
-        # struct lua_longjmp *errorJmp;
-        errfunc*: int64
-        base_ci*: CallInfo
+import types
 
 
 template CT(x:int):int = 1 shl x

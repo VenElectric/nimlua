@@ -1,77 +1,23 @@
+import types
 
-type
-    OpMode = enum
-        iABC,
-        iABx,
-        iAsBx,
-        iAx
-    OpCodes = enum
-        OP_MOVE,
-        OP_LOADK,
-        OP_LOADKX,
-        OP_LOADBOOL,
-        OP_LOADNIL,
-        OP_GETUPVAL,
-        OP_GETTABUP,
-        OP_GETTABLE,
-        OP_SETTABUP,
-        OP_SETUPVAL,
-        OP_SETTABLE,
-        OP_NEWTABLE,
-        OP_SELF,
-        OP_ADD,
-        OP_SUB,
-        OP_MUL,
-        OP_DIV,
-        OP_MOD,
-        OP_POW,
-        OP_UNM,
-        OP_NOT,
-        OP_LEN,
-        OP_CONCAT,
-        OP_JMP,
-        OP_EQ,
-        OP_LT,
-        OP_LE,
-        OP_TEST,
-        OP_TESTSET,
-        OP_CALL,
-        OP_TAILCALL,
-        OP_RETURN,
-        OP_FORLOOP,
-        OP_FORPREP,
-        OP_TFORCALL,
-        OP_TFORLOOP,
-        OP_SETLIST,
-        OP_CLOSURE,
-        OP_VARARG,
-        OP_EXTRAARG
-    OpArgMask = enum
-        OpArgN,
-        OpArgU,
-        OpArgR,
-        OpArgK
+# iABC, iABx, iAsBx, iAx
 
-const SIZE_C = 9
-const SIZE_B = 9
-const SIZE_Bx = SIZE_C + SIZE_B
-const SIZE_A = 8
-const SIZE_Ax = SIZE_C + SIZE_B + SIZE_A
 
-const SIZE_OP = 6
+proc createABC*(opcode:OpCodes,a,b,c:uint8):Instruction =
+    result = Instruction(opcode:opcode,mode:OMABC,abc:(a,b,c))
 
-const POS_OP = 0
-const POS_A = POS_OP + SIZE_OP
-const POS_C = POS_A + SIZE_A
-const POS_B = POS_C + SIZE_C
-const POS_Ax = POS_A
-const POS_Bx = POS_C
+proc createABx*(opcode:OpCodes,a:uint8,bx:uint16):Instruction =
+    result = Instruction(opcode:opcode,mode:OMABx,abx:(a,bx))
 
-const MAXARG_Ax = (1 shl SIZE_Ax) - 1
-const MAXARG_Bx = (1 shl SIZE_Bx) - 1
-const MAXARG_sBx = MAXARG_Bx shr 1
+proc createAsBx*(opcode:OpCodes,a:uint8,bx:int16):Instruction = 
+    result = Instruction(opcode:opcode,mode:OMAsBx,asbx:(a,bx))
 
-proc MASK1(n:int,p:int): int = result = 0
+proc createAx*(opcode:OpCodes,ax:uint32): Instruction =
+    result = Instruction(opcode:opcode,mode:OMAx,ax:ax)
 
-proc GET_OPCODE(i:int): OpCodes = discard
+proc isABC(i:Instruction): bool = i.mode == OMABC
+proc isABx(i:Instruction): bool = i.mode == OMABx
+proc isAsBx*(i:Instruction): bool = i.mode == OMAsBx
+proc isAx*(i:Instruction): bool = i.mode == OMAx
+
 
