@@ -1,16 +1,16 @@
-import types,lobject
+import types
 
 proc readInstruction(L: var LuaState):Instruction = 
     inc(L.CI.savedpc)
     return L.CI.code[L.CI.savedpc]
 
-template binary_op(op:untyped) = 
-    let rhs: LuaValue = pop(vm)
-    let lhs: LuaValue = pop(vm)
-    if not kisNumber(lhs) or not kisNumber(lhs):
-        runtimeError(vm,"Operands Must Be Numbers")
-        result = RESULT_RUNTIME_ERROR
-    push(vm,op(lhs,rhs))
+# template binary_op(op:untyped) = 
+#     let rhs: LuaValue = pop(vm)
+#     let lhs: LuaValue = pop(vm)
+#     if not kisNumber(lhs) or not kisNumber(lhs):
+#         runtimeError(vm,"Operands Must Be Numbers")
+#         result = RESULT_RUNTIME_ERROR
+#     push(vm,op(lhs,rhs))
 
 proc lauV_execute*(L:var LuaState) = 
 

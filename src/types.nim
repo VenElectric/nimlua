@@ -98,8 +98,6 @@ type
                 asbx*: tuple[a:uint8,bx:int16]
             of OMAx:
                 ax*: uint32
-    LuaNumber* = distinct float64
-    LuaString* = distinct string
     FuncState* = distinct pointer
     ZIO* = distinct pointer
     Dyndata* = distinct pointer
@@ -109,6 +107,44 @@ type
     LuaAlloc* = proc(ud:auto,pt:pointer,osize:int,nsize:int)
     LuaTable* = Table[string,LuaValue]
     UserData* = ref LuaTable
+    CallInfo* = ref CallInfoBase
+    CallInfoBase =  object
+        fun*:int
+        top*:int
+        nresults*: int
+        callstatus*: uint8
+        previous*: CallInfo
+        next*: CallInfo
+        case kind*:ClosureKind
+            of LClosure: 
+                base*: int
+                code*: seq[Instruction]
+                savedpc*: int = 0
+            of NClosure: 
+                ctx*:int
+                k*: LuaNimFunction
+                old_errfunc*: int
+                old_allowhook*: uint8
+                status*: uint8
+    GlobalState* = object #placeholder
+    LuaState* = ref LuaStateBase
+    LuaStateBase* = object 
+        # CommonHeader;
+        status: uint8
+        # StkId top
+        LG: GlobalState
+        CI*: CallInfo
+        oldPC: uint32
+        stack: seq[LuaValue]
+        stacksize: int
+        nny: uint16
+        nCcalls: uint16
+        hookmask: uint8
+        allowhook: uint8
+        basehookcount: int
+        hookcount: int
+        errfunc: int64
+        base_ci: CallInfo
     Proto* = ref ProtoBase
     ProtoBase* = object 
         constants*: seq[LuaValue]
@@ -125,3 +161,20 @@ type
         case kind*: ClosureKind
             of LClosure: l*: LuaClosure
             of NClosure: n*: NimClosure
+    LuaNumber* = distinct float64
+    LuaString* = distinct string
+    LuaValue* = ref LuaValueBase
+    LuaValueBase* = object
+        case kind*: LuaValueKind
+            of LUA_TNIL: discard
+            of LUA_TBOOLEAN: boolv*:bool
+            of LUA_TLIGHTUSERDATA: luserv*: UserData
+            of LUA_TNUMBER: numv*: LuaNumber
+            of LUA_TSTRING: strv*: LuaString
+            of LUA_TTABLE: tablev*: LuaTable
+            of LUA_TFUNCTION: funcv*: Closure
+            of LUA_TUSERDATA: userv*: UserData
+            of LUA_TTHREAD: threadv*: LuaState
+            of LUA_TPROTO: protov*: Proto
+
+# proc `savedpc=`(c:CallInfo,value:int) = c.savedpc 

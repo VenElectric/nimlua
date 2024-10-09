@@ -1,20 +1,5 @@
 import types
 
-type
-    LuaValue* = ref LuaValueBase
-    LuaValueBase = object
-        case kind*: LuaValueKind
-            of LUA_TNIL: discard
-            of LUA_TBOOLEAN: boolv*:bool
-            of LUA_TLIGHTUSERDATA: luserv*: UserData
-            of LUA_TNUMBER: numv*: LuaNumber
-            of LUA_TSTRING: strv*: LuaString
-            of LUA_TTABLE: tablev*: LuaTable
-            of LUA_TFUNCTION: funcv*: Closure
-            of LUA_TUSERDATA: userv*: UserData
-            of LUA_TTHREAD: threadv*: LuaState
-            of LUA_TPROTO: protov*: Proto
-
 func checkKind*(one,two:LuaValueKind): bool = one == two
 func k*(lv: LuaValue): LuaValueKind = lv.kind
 
