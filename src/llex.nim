@@ -1,8 +1,8 @@
 import std/[lexbase, strformat]
-from streams import newStringStream
+from streams import newStringStream,newFileStream
 from parseutils import skipUntil,parseWhile,parseUntil
 from strutils import Digits, IdentChars, Letters
-import types
+import types,luaconf
 
 const
     FIRST_RESERVED = 257
@@ -85,10 +85,12 @@ type
         lexeme: string
         fs: FuncState
         L: LuaState
+        envname: LuaString
     SyntaxError = object of CatchableError
 
 using
     ls: var LexState
+    L: LuaState
 
 const NewLineChars = {'\r', '\n', '\c'}
 const WhiteSpaceChars = {' ', '\t', '\f', '\v'}
@@ -99,6 +101,23 @@ proc token*(l:LexState): Token = l.t
 proc kind*(t:Token): TokenKind = t.kind
 proc lexeme*(t:Token): string = t.lexeme
 proc funcstate*(ls): FuncState = ls.fs
+proc env*(ls): LuaString = ls.envname
+
+proc newLexState(L):LexState =
+    result = LexState()
+    result.L = L
+    result.lastline = 1
+    result.lineNumber = 1
+    result.envname = LuaString(LUA_ENV)
+
+proc initWithString*(L;contents: string): LexState =
+    result = newLexState(L)
+    result.open(newStringStream(contents))
+
+proc initWithFile*(L;fileName: string): LexState =
+    result = newLexState(L)
+    result.open(newFileStream(fileName))
+
 
 proc lexerror*(exc:typedesc,msg:string,k:TokenKind,linenumber:int) = raise newException(exc,fmt"{msg} | Token: {k} | line: {linenumber}")
 
@@ -153,15 +172,6 @@ func createCommentToken(ls: LexState): Token = result = createToken(ls,
         TK_COMMENT, "comment")
 
 func createEOFToken(ls:LexState): Token = result = createToken(ls,TK_EOS,"eof")
-
-proc initWithString*(contents: string): LexState =
-    result = LexState()
-    result.lineNumber = 1
-    result.open(newStringStream(contents))
-
-proc initWithFile*(fileName: string): LexState =
-    let contents = readFile(fileName)
-    result = initWithString(contents)
 
 template peek(): char = ls.buf[ls.bufpos]
 template peekNext(): char = ls.buf[ls.bufpos+1]
@@ -387,14 +397,6 @@ proc lua_next*(ls:var LexState) =
         ls.t = getToken(ls)
 
 
-
-# proc luaX_setinput*(L: lua_State, ls: LexState, z: ZIO, source: TString,
-#         firstchar: int) = discard
-# proc luaX_newstring*(ls: LexState, str: string, l: int): TString = discard
-# proc luaX_next*(ls: LexState) = discard
-# proc luaX_lookahead*(ls: LexState): int = discard
-# proc luaX_syntaxerror*(ls: LexState, s: string) = discard # what is __attribute__???
-# proc luaX_token2str*(ls: LexState, token: int): string = discard
 
 
 

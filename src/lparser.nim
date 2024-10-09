@@ -1,4 +1,4 @@
-import llex,types
+import llex,types,lfunc
 import std/strformat
 
 const MAX_VARS = 200
@@ -131,6 +131,8 @@ proc statlist(vls) =
             return
         statement(vls)
 
-proc lua_parser(L:LuaState,contents:string) = 
-    let ls = initWithString(contents)
+proc lua_parser(L:LuaState,contents:string): Closure = 
+    let ls = initWithString(L,contents)
+    let cl = newLClosure(L,1)
+    L.stack
 
