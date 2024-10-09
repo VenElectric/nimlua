@@ -23,6 +23,35 @@ func kisUserData*(lv:LuaValue): bool = checkKind(lv.k,LUA_TUSERDATA)
 func kisThread*(lv:LuaValue): bool = checkKind(lv.k,LUA_TTHREAD)
 func kisProto*(lv:LuaValue): bool = checkKind(lv.k,LUA_TPROTO)
 
+converter toLBool*(v:LuaValue): bool = 
+    if checkKind(v.kind,LUA_TBOOLEAN):
+        return v.boolv
+    else:
+        return false
+
+converter toLNumber*(v:LuaValue): LuaNumber =
+    if checkKind(v.kind,LUA_TNUMBER):
+        return v.numv
+    else:
+        return LuaNumber(NaN)
+
+converter toFloat*(v:LuaNumber): float64 = float64(v)
+
+converter toLString*(v:LuaValue): LuaString = 
+    if checkKind(v.kind,LUA_TSTRING):
+        return v.strv
+    else:
+        return LuaString("")
+
+converter toString*(v:LuaString): string = string(v)
+
+
+
+
+
+
+
+
 
 
 

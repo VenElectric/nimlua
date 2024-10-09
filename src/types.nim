@@ -68,6 +68,23 @@ type
         LUA_TUSERDATA
         LUA_TTHREAD
         LUA_TPROTO
+    BinOpr* = enum
+       OPR_ADD
+       OPR_SUB
+       OPR_MUL
+       OPR_DIV
+       OPR_MOD
+       OPR_POW
+       OPR_CONCAT
+       OPR_EQ
+       OPR_LT
+       OPR_LE
+       OPR_NE
+       OPR_GT
+       OPR_GE
+       OPR_AND
+       OPR_OR
+       OPR_NOBINOPR 
 type 
     Instruction* = ref object
         opcode*: OpCodes

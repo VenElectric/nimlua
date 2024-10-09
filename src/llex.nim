@@ -75,16 +75,16 @@ type
 
 type
     Token* = object
-        kind*: TokenKind
-        lexeme*: string
-        linenumber*: int
+        kind: TokenKind
+        lexeme: string
+        linenumber: int
     LexState* = object of BaseLexer
         lastline: int
-        curtoken: Token
+        t: Token
         lookahead: Token
         lexeme: string
         fs: FuncState
-        L: lua_State
+        L: LuaState
     SyntaxError = object of CatchableError
 
 using
@@ -94,12 +94,17 @@ const NewLineChars = {'\r', '\n', '\c'}
 const WhiteSpaceChars = {' ', '\t', '\f', '\v'}
 const NotationChars = {'e', 'x', '.'}
 
-proc getCurToken*(ls:LexState): Token = result = ls.curtoken
+proc token*(l:LexState): Token = l.t
 
-proc getLookahead*(ls:LexState):Token = result = ls.lookahead
+proc kind*(t:Token): TokenKind = t.kind
+proc lexeme*(t:Token): string = t.lexeme
+proc funcstate*(ls): FuncState = ls.fs
 
-proc syntax_error(msg: string, token: TokenKind, lineNum: int) =
-    raise newException(SyntaxError, fmt"{msg} | Token: {token} | Line: {lineNum}")
+proc lexerror*(exc:typedesc,msg:string,k:TokenKind,linenumber:int) = raise newException(exc,fmt"{msg} | Token: {k} | line: {linenumber}")
+
+
+
+proc syntax_error*(msg: string, k:TokenKind,linenumber:int) = lexerror(SyntaxError,msg,k,linenumber)
 
 
 proc getReserved(ls: LexState): TokenKind =
@@ -375,11 +380,11 @@ proc getToken*(ls: var LexState): Token =
 
 proc lua_next*(ls:var LexState) = 
     if unlikely(isEOF(ls)): 
-        ls.curtoken = createEOFToken(ls)
+        ls.t = createEOFToken(ls)
         ls.close()
     else:
         ls.lastline = ls.lineNumber
-        ls.curtoken = getToken(ls)
+        ls.t = getToken(ls)
 
 
 
