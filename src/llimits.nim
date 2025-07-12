@@ -1,5 +1,0 @@
-
-const
-    MAXSTACK* = 250
-
-    

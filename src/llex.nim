@@ -1,16 +1,6 @@
-import std/[lexbase, strformat]
-from streams import newStringStream,newFileStream
-from parseutils import skipUntil,parseWhile,parseUntil
+import std/[lexbase, strformat, parseutils, strscans]
+from streams import newStringStream
 from strutils import Digits, IdentChars, Letters
-import types,luaconf
-
-const
-    FIRST_RESERVED = 257
-    luaX_tokens = ["and", "break", "do", "else", "elseif", "end", "false",
-    "for", "function", "goto", "if", "in", "local", "nil", "not", "or",
-    "repeat",
-    "return", "then", "true", "until", "while",
-    "..", "...", "==", ">=", "<=", "~=", "::"]
 
 
 type
@@ -44,8 +34,8 @@ type
         TK_LE = "<="
         TK_NE = "~="
         TK_DBCOLON = "::"
-        TK_EOS
-        TK_NUMBER
+        TK_EOF = "<EOF>"
+        TK_NUMBER = "{NUMBER}"
         TK_NAME
         TK_STRING
         TK_LESS = "<"
@@ -68,7 +58,6 @@ type
         TK_LEFTSTAPLE = "["
         TK_RIGHTSTAPLE = "]"
         TK_HASH = "#"
-        TK_COMMENT
         TK_ERROR
 
 # let NUM_RESERVED = int(TK_WHILE) - (FIRST_RESERVED + 1)
@@ -79,55 +68,37 @@ type
         lexeme: string
         linenumber: int
     LexState* = object of BaseLexer
-        lastline: int
-        t: Token
-        lookahead: Token
         lexeme: string
-        fs: FuncState
-        L: LuaState
-        envname: LuaString
+        start: int
+        currentToken: Token
     SyntaxError = object of CatchableError
 
 using
     ls: var LexState
-    L: LuaState
+    l: LexState
 
-const NewLineChars = {'\r', '\n', '\c'}
-const WhiteSpaceChars = {' ', '\t', '\f', '\v'}
-const NotationChars = {'e', 'x', '.'}
+# const NewLineChars = {'\r', '\n', '\c'}
+# const WhiteSpaceChars = {' ', '\t', '\f', '\v'}
+# const NotationChars = {'e', 'x', '.'}
 
-proc token*(l:LexState): Token = l.t
 
-proc kind*(t:Token): TokenKind = t.kind
-proc lexeme*(t:Token): string = t.lexeme
-proc funcstate*(ls): FuncState = ls.fs
-proc env*(ls): LuaString = ls.envname
-
-proc newLexState(L):LexState =
+proc initWithString*(contents: string): LexState =
     result = LexState()
-    result.L = L
-    result.lastline = 1
     result.lineNumber = 1
-    result.envname = LuaString(LUA_ENV)
-
-proc initWithString*(L;contents: string): LexState =
-    result = newLexState(L)
     result.open(newStringStream(contents))
 
-proc initWithFile*(L;fileName: string): LexState =
-    result = newLexState(L)
-    result.open(newFileStream(fileName))
+proc initWithFile*(fileName: string): LexState =
+    let contents = readFile(fileName)
+    result = initWithString(contents)
+
+func currentToken*(ls): Token = ls.currentToken
+
+proc syntaxError(lineNum: int, msg: string) =
+    raise newException(SyntaxError, fmt"{msg} | Line: {lineNum}")
 
 
-proc lexerror*(exc:typedesc,msg:string,k:TokenKind,linenumber:int) = raise newException(exc,fmt"{msg} | Token: {k} | line: {linenumber}")
-
-
-
-proc syntax_error*(msg: string, k:TokenKind,linenumber:int) = lexerror(SyntaxError,msg,k,linenumber)
-
-
-proc getReserved(ls: LexState): TokenKind =
-    case ls.lexeme:
+proc getReserved(lexeme: string): TokenKind =
+    case lexeme:
         of "and":
             result = TK_AND
         of "break":
@@ -157,245 +128,167 @@ proc getReserved(ls: LexState): TokenKind =
         else:
             result = TK_NAME
 
-func createToken(ls: LexState, kind: TokenKind,
-        lexeme: string): Token = result = Token(kind: kind, lexeme: lexeme,
-        linenumber: ls.lineNumber)
-func createStringToken(ls: LexState): Token = result = createToken(ls,
-        TK_STRING, ls.lexeme)
-func createReservedToken(ls: LexState): Token = result = createToken(ls,
-        getReserved(ls), ls.lexeme)
-func createNameToken(ls: LexState): Token = result = createToken(ls, TK_NAME, ls.lexeme)
-func createNumberToken(ls: LexState): Token = result = createToken(ls,
-        TK_NUMBER, ls.lexeme)
+func createToken(linenumber: int, kind: TokenKind, lexeme: string): Token =
+    result = Token(kind: kind, lexeme: lexeme, linenumber: linenumber)
 
-func createCommentToken(ls: LexState): Token = result = createToken(ls,
-        TK_COMMENT, "comment")
+func createEOFToken(linenumber: int): Token = result = createToken(linenumber,
+        TK_EOF, "eof")
 
-func createEOFToken(ls:LexState): Token = result = createToken(ls,TK_EOS,"eof")
+func createErrorToken(linenumber: int, msg: string): Token = createToken(
+        linenumber, TK_ERROR, msg)
 
-template peek(): char = ls.buf[ls.bufpos]
-template peekNext(): char = ls.buf[ls.bufpos+1]
+func isEOF(l): bool = l.buf[l.bufpos] == EndOfFile
 
-proc getLineNumber*(ls: LexState): int = result = ls.lineNumber
+func peek(l; pos: int = 0): char =
+    if isEOF(l):
+        return '\0'
+    return l.buf[l.bufpos + pos]
 
-proc isEOF(ls: LexState): bool = result = peek() == EndOfFile
+func lineNumber*(l): int = l.lineNumber
 
-proc advance(ls: var LexState) =
-    if (isEof(ls)): return
-    inc(ls.bufpos)
 
-proc advance(ls: var LexState, num: int) =
-    if (isEof(ls)): return
-    inc(ls.bufpos, num)
-
-proc handleNewline(ls: var LexState) =
-    case peek():
+proc handleNewline(ls) =
+    case peek(ls):
         of '\c': ls.bufpos = ls.handleCR(ls.bufpos)
         of '\n': ls.bufpos = ls.handleLF(ls.bufpos)
         else: discard
 
-proc match(ls; ch: char): bool =
-    result = false
-    if peek() == ch:
-        advance(ls)
-        result = true
+proc skip(ls;steps: int = 1) = inc(ls.bufpos,steps)
 
-func resetLexeme(ls: var LexState) = ls.lexeme = ""
+proc check(ls; lexeme: var string, ch: char): int =
+    result = 0
 
-proc skipByChar(ls: var LexState, ch: char) =
-    let skipped = skipUntil(ls.buf, ch, ls.bufpos)
-    advance(ls, skipped)
+    if ch == peek(ls):
+        lexeme.add(ch)
+        inc(result)
 
-proc skipByChars(ls: var LexState, chars: set[char]) =
-    let skipped = skipUntil(ls.buf, chars, ls.bufpos)
-    advance(ls, skipped)
+proc check(ls;lexeme: var string,chars: set[char]): int =
+    result = 0
 
-proc saveUntil(ls: var LexState, ch: char): int = result = parseUntil(ls.buf,
-        ls.lexeme, ch, ls.bufpos)
-proc saveUntil(ls: var LexState, chars: set[char]): int = result = parseUntil(
-        ls.buf, ls.lexeme, chars, ls.bufpos)
+    if peek(ls) in chars:
+        lexeme.add(ch)
+        inc(result)
 
-proc saveWhile(ls; chars: set[char]): int = result = parseWhile(ls.buf,
-        ls.lexeme, chars, ls.bufpos)
-
-proc saveWhile(ls; sink:var string, chars: set[char]): int = result = parseWhile(ls.buf,sink, chars, ls.bufpos)
-
-proc skipComment(ls: var LexState) = skipByChars(ls, NewLineChars)
-
-proc skipLongComment(ls: var LexState) =
-    skipByChar(ls, ']')
-    advance(ls)
-    if not match(ls, ']'):
-        syntax_error("Unterminated long comment", TK_STRING, ls.lineNumber)
-
-proc readLongString(ls: var LexState) =
-    # skip [[
-    advance(ls)
-    advance(ls)
-
-    let saved = saveUntil(ls, ']')
-    advance(ls, saved)
-    if saved == 0 or isEOF(ls):
-        syntax_error("Unterminated long string", TK_STRING, ls.lineNumber)
-    advance(ls)
-    if peek() != ']':
-        syntax_error("Long string not terminated by ]]", TK_STRING, ls.lineNumber)
-    advance(ls)
-
-proc isReserved(ls): bool =
-    result = false
-    if ls.lexeme in luaX_tokens:
-        result = true
+proc skipComment(ls): bool = scanp(ls.buf, ls.bufpos, "--", +(~'\L'),'\L')
 
 
-proc readString(ls) =
-    advance(ls)
-    let saved = saveUntil(ls, {'"', '\''})
-    advance(ls, saved)
-    if saved == 0 or isEOF(ls):
-        syntax_error("Unterminated string", TK_STRING, ls.lineNumber)
-        # escape sequence handling later
-    advance(ls)
+proc skipLongComment(ls):bool = scanp(ls.buf, ls.bufpos, +(~{'-', '\0'}, '\L' -> handleNewline(ls)), "--]]")
+
+proc readLongString(ls): bool = scanp(ls.buf, ls.bufpos, "[[", +(~{']', '\0'} -> lexeme.add($_), '\L' -> handleNewline(ls)), "]]")
 
 
-proc readNumeral(ls) =
+proc readString(ls): bool = scanp(ls.buf, ls.bufpos, +(~{'\'', '"', '\L', '\0'} -> lexeme.add($_)), `quoteChar`)
+
+# float 5.0
+# exponent 5e+20
+# 4     0.4     4.57e-3     0.3e12     5e+20
     # how to handle
     # countries that don't use '.'
-    # potentially get entire lexeme before doing checks on whether ',' or '.'
-    var str: string
-    let saved = saveWhile(ls,str, Digits)
-    add(ls.lexeme, str)
-    advance(ls, saved)
-    if peek() in NotationChars and peekNext() in Digits:
-        add(ls.lexeme, peek())
-        var afterStr: string
-        let savedAfter = saveWhile(ls,afterStr, Digits)
-        advance(ls, savedAfter)
-        add(ls.lexeme, afterStr)
-    else:
-        case peek():
-            of '.':
-                syntax_error("Invalid decimal placement for decimal number",
-                        TK_NUMBER, ls.lineNumber)
-            of 'x':
-                syntax_error("Invalid binary number", TK_NUMBER, ls.lineNumber)
-            of 'e':
-                syntax_error("Invalid decimal exponent", TK_NUMBER, ls.lineNumber)
-            else: discard
+    # potentially get entire lexeme before doing checks on whether ',' or '.
 
-proc readVar(ls: var LexState) =
-    let saved = saveWhile(ls, IdentChars)
-    advance(ls, saved)
 
-#ternary token match
-template TTM(ch: char, tCond: TokenKind, fCond: TokenKind) =
-    advance(ls)
-    if match(ls, ch):
-        result = createToken(ls, tCond, $tCond)
-        continue
-    else:
-        result = createToken(ls, fCond, $fCond)
-        continue
+proc readNumeral(ls): bool = 
+    discard scanp(ls.buf,ls.bufpos,+(`Digits`,~'\L') -> ls.lexeme.add($_))
+    discard scanp(ls.buf,ls.bufpos,+(`Digits`,~'\L') -> ls.lexeme.add($_),check(ls,ls.lexeme,{'.',','}),+(`Digits`,~'\L') -> ls.lexeme.add($_))
+    discard scanp(ls.buf,ls.bufpos,+(`Digits`,~'\L') -> ls.lexeme.add($_),check(ls,ls.lexeme,'e'),check(ls,ls.lexeme,{'.',','}),+(`Digits`,~'\L') -> ls.lexeme.add($_))
+    scanp(ls.buf, ls.bufpos, +`Digits` -> lexeme.add($_), check(ls, lexeme,
+            '.'), (check(ls, lexeme, 'e'), (check(ls, lexeme, '+'), check(ls,
+            lexeme, '-'))), +`Digits` -> lexeme.add($_))
 
-proc getToken*(ls: var LexState): Token =
-    while not isEOF(ls):
-        case peek():
-            of WhitespaceChars: discard
-            of NewLineChars:
-                handleNewline(ls)
-                continue
-            of '-':
-                advance(ls)
-                if match(ls, '-'):
-                    if peek() == '[' and peekNext() == '[':
-                        skipLongComment(ls)
-                        result = createCommentToken(ls)
-                    else:
-                        skipComment(ls)
-                        result = createCommentToken(ls)
+proc readVar(ls): bool = scanp(ls.buf, ls.bufpos, parseIdent(ls.buf, lexeme, ls.bufpos))
 
-                else:
-                    result = createToken(ls, TK_MINUS, $TK_MINUS)
-                continue
-            of '[':
-                if peekNext() == '[':
-                    readLongString(ls)
-                    result = createStringToken(ls)
-                    resetLexeme(ls)
-                    continue
-                else:
-                    result = createToken(ls, TK_LEFTSTAPLE, $TK_LEFTSTAPLE)
-            of ']':
-                result = createToken(ls, TK_RIGHTSTAPLE, $TK_RIGHTSTAPLE)
-            of '=': TTM('=', TK_EQEQ, TK_EQ)
-            of '<': TTM('=', TK_LE, TK_LESS)
-            of '>': TTM('=', TK_GE, TK_GREATER)
-            of '~': TTM('=', TK_NE, TK_NOT)
-            of ':': TTM(':', TK_DBCOLON, TK_COLON)
-            of '"', '\'':
-                if peek() == '"' and peekNext() == '"':
-                    advance(ls)
-                    result = createToken(ls, TK_STRING, "\"\"")
-                elif peek() == '\'' and peekNext() == '\'':
-                    advance(ls)
-                    result = createToken(ls, TK_STRING, "''")
-                elif peekNext() in Letters:
-                    readString(ls)
-                    result = createStringToken(ls)
-                    resetLexeme(ls)
-                    continue
-                else:
-                    syntax_error("Invalid String", TK_STRING, ls.lineNumber)
-            of Digits:
-                readNumeral(ls)
-                result = createNumberToken(ls)
-                resetLexeme(ls)
-                continue
-            of '.':
-                advance(ls)
-                if match(ls, '.'):
-                    if match(ls, '.'):
-                        result = createToken(ls, TK_DOTS, $TK_DOTS)
-                        continue
-                    else:
-                        result = createToken(ls, TK_CONCAT, $TK_CONCAT)
-                        continue
-                else:
-                    result = createToken(ls, TK_DOT, $TK_DOT)
-            of '+': result = createToken(ls, TK_PLUS, $TK_PLUS)
-            of '*': result = createToken(ls, TK_STAR, $TK_STAR)
-            of '/': result = createToken(ls, TK_SLASH, $TK_SLASH)
-            of '(': result = createToken(ls, TK_LEFTPAREN, $TK_LEFTPAREN)
-            of ')': result = createToken(ls, TK_RIGHTPAREN, $TK_RIGHTPAREN)
-            of '{': result = createToken(ls, TK_LEFTBRACKET, $TK_LEFTBRACKET)
-            of '}': result = createToken(ls, TK_RIGHTBRACKET, $TK_RIGHTBRACKET)
-            of ';': result = createToken(ls, TK_SEMCOL, $TK_SEMCOL)
-            of '%': result = createToken(ls, TK_MOD, $TK_MOD)
-            of '#': result = createToken(ls, TK_HASH, $TK_HASH)
-            of ',': result = createToken(ls, TK_COMMA, $TK_COMMA)
-            of '^': result = createToken(ls, TK_CARROT, $TK_CARROT)
+
+proc get_char_literal_token(ch: char): TokenKind =
+
+    case ch:
+        of ',': result = TK_COMMA
+        of '(': result = TK_LEFTPAREN
+        of ')': result = TK_RIGHTPAREN
+        of ']': result = TK_LEFTSTAPLE
+        of '{': result = TK_LEFTBRACKET
+        of '}': result = TK_RIGHTBRACKET
+        of ';': result = TK_SEMCOL
+        of '#': result = TK_HASH
+        of '+': result = TK_PLUS
+        of '^': result = TK_CARROT
+        of '%': result = TK_MOD
+        of '*': result = TK_STAR
+        of '/': result = TK_SLASH
+        of ':': result = TK_COLON
+        of '-': result = TK_MINUS
+        of '=': result = TK_EQ
+        of '>': result = TK_GE
+        of '<': result = TK_LE
+        of '[': result = TK_RIGHTSTAPLE
+        else: result = TK_ERROR
+
+proc parseLiteral(ls): Token =
+    var kind = TK_ERROR
+    case peek(ls):
+        of ',': kind = TK_COMMA
+        of '(': kind = TK_LEFTPAREN
+        of ')': kind = TK_RIGHTPAREN
+        of ']': kind = TK_LEFTSTAPLE
+        of '{': kind = TK_LEFTBRACKET
+        of '}': kind = TK_RIGHTBRACKET
+        of ';': kind = TK_SEMCOL
+        of '#': kind = TK_HASH
+        of '+': kind = TK_PLUS
+        of '^': kind = TK_CARROT
+        of '%': kind = TK_MOD
+        of '*': kind = TK_STAR
+        of '/': kind = TK_SLASH
+        of ':': 
+            if peek(ls,1) == ':':
+                skip(ls)
+                kind = TK_DBCOLON
             else:
-                if peek() in IdentChars:
-                    readVar(ls)
-                    if isReserved(ls):
-                        result = createReservedToken(ls)
-                    else:
-                        result = createNameToken(ls)
-                    resetLexeme(ls)
-                    continue
-                else:
-                    result = createToken(ls, TK_ERROR, "error")
-        advance(ls)
+                kind = TK_COLON
+        of '-': kind = TK_MINUS
+        of '=': kind = TK_EQ
+        of '>': kind = TK_GE
+        of '<': kind = TK_LE
+        of '[': kind = TK_RIGHTSTAPLE
+        else: kind = TK_ERROR
+
+    if kind == TK_ERROR:
+        syntaxError(ls.lineNumber,fmt"Invalid character {$peek(ls)}")
+
+    return createToken(ls.lineNumber,kind,$kind)
 
 
-proc lua_next*(ls:var LexState) = 
-    if unlikely(isEOF(ls)): 
-        ls.t = createEOFToken(ls)
-        ls.close()
+
+const LITERALS = {',', '(', ')', ']', '{', '}', '+', '/', '*', ';', '#', '^',
+        '%', '.', '=', '>', '<', '-', '[', ':'}
+
+
+proc getToken(ls): Token =
+
+    var tk: TokenKind = TK_ERROR
+
+    if scanp(ls.buf,ls.bufpos,'\L' -> handleNewline(ls)):
+        return getToken(ls)
+    if scanp(ls.buf,ls.bufpos,'\0'):
+        return createEOFToken(ls.linenumber)
+    elif scanp(ls.buf, ls.bufpos, "..." -> (tk = TK_DOTS),
+            ".." -> (tk = TK_CONCAT), '.' -> (tk = TK_DOT),
+            ">=" -> (tk = TK_GE), "<=" -> (tk = TK_LE),
+            "==" -> (tk = TK_EQEQ), "::" -> (tk = TK_DBCOLON)):
+        return createToken(ls.linenumber,tk,$tk)
+    elif scanp(ls.buf,ls.bufpos,"[["):
+        return readLongString(ls)
+    elif scanp(ls.buf, ls.bufpos, "--[[" -> skipLongComment(ls), "--" -> skipComment(ls)):
+        return getToken(ls)
+    elif scanp(ls.buf, ls.bufpos, `LITERALS` -> (tk = get_char_literal_token($_))):
+        return createToken(ls.lineNumber,tk,$tk)
+    elif scanp(ls.buf,ls.bufpos,{'\'','"'}):
+        return readString(ls)
+    elif peek(ls) in Digits:
+        return readNumeral(ls)
+    elif peek(ls) in IdentChars:
+        return readVar(ls)
     else:
-        ls.lastline = ls.lineNumber
-        ls.t = getToken(ls)
-
+        return createErrorToken(ls.linenumber,"Unhandled Lex Error")
 
 
 
