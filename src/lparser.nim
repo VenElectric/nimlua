@@ -20,95 +20,34 @@ type
         VCALL,
         VVARARG
 
-type 
-    FuncState = object
-        pc: int
-        lasttarget: int
-        jpc: int
-        nk: int
-        np: int
-        firstlocal: int
-        nlocvars: int 
-        nactvar: char
-        nups: char
-        freereg: char
-    ExprDesc = object
 
-using 
-    vls:var LexState
-    ls: LexState
+using
+    ls:var LexState
 
-proc compile_error(ls:LexState,k:TokenKind) = lexerror(CatchableError,"Compile Error",k,ls.lineNumber)
+proc expression(ls) = discard
+  
+proc returnstmt(ls) = discard
 
-proc statement(vls)
-proc expression(vls;v:ExprDesc)
+proc gotostmt(ls) = discard
+  
+proc localstmt(ls) = discard
+  
+proc functionstmt(ls) = discard
 
-# proc anchortoken()
+proc forstmt(ls) = discard
 
-proc semerror(vls;msg:string) = syntax_error(msg,vls.token.kind,vls.lineNumber)
+proc repeatstmt(ls) = discard
+  
+proc whilestmt(ls) = discard
 
-proc errorexpected(vls;k:TokenKind) = syntax_error(fmt"{k} expected",k,vls.lineNumber)
+proc blockstmt(ls) = discard
+  
+proc ifstmt(ls) = discard
 
-proc testnext(vls;k:TokenKind): bool =
-    if vls.token.kind == k:
-        lua_next(vls)
-        return true
-    else: return false
+proc statement(ls) =
 
-proc check(vls;k:TokenKind) = 
-    if vls.token.kind != k: 
-        errorexpected(vls,k)
-
-proc checknext(vls;k:TokenKind) =
-    check(vls,k)
-    lua_next(vls)
-
-proc checkmatch(vls;what:TokenKind,who:TokenKind,where:int) =
-    if not testnext(vls,what):
-        if where == vls.linenumber:
-            errorexpected(vls,what)
-        else:
-            syntax_error(fmt"{what} expected to close {who} at line {where}",what,where)
-
-
-
-
-
-proc enterlevel(vls) = discard
-
-proc checkToken(vls;kind:TokenKind) =
-    if (vls.token.kind != kind):
-        compile_error(vls,kind) 
-
-proc subexpr(vls;v:ExprDesc,limit:int): BinOpr =
-    enterlevel(vls)
-
-
-proc expression(vls;v:ExprDesc) = discard subexpr(vls,v,0)
-
-proc block_follow(vls;withuntil:bool): bool = 
-    case vls.token.kind:
-        of TK_ELSE,TK_ELSEIF,TK_END,TK_EOS: return true
-        of TK_UNTIL: return withuntil
-        else: return false
-
-proc testthenblock*(vls;escapelist:seq[int]) =
-    let fs = vls.funcstate
-    var exp = ExprDesc()
-    lua_next(vls)
-    expression(vls,exp)
-
-proc ifstatement(vls;line:int) =
-    let fs = vls.funcstate
-
-
-proc retstatement(vls) = discard
-
-
-proc statement(vls) = 
-
-    case vls.token.kind:
-        of TK_SEMCOL: lua_next(vls)
+    case ls.currentToken.kind:
+        of TK_SEMCOL: discard
         of TK_IF:
             discard
         of TK_WHILE: discard
@@ -124,15 +63,14 @@ proc statement(vls) =
 
 
 
-proc statlist(vls) =
-    while not block_follow(vls,true):
-        if vls.token.kind == TK_RETURN:
-            statement(vls)
-            return
-        statement(vls)
+proc statlist(ls) = discard
+    # while not block_follow(ls,true):
+    #     if ls.token.kind == TK_RETURN:
+    #         statement(ls)
+    #         return
+    #     statement(ls)
 
-proc lua_parser(L:LuaState,contents:string): Closure = 
-    let ls = initWithString(L,contents)
-    let cl = newLClosure(L,1)
-    L.stack
-
+# proc lua_parser(L:LuaState,contents:string): Closure =
+#     let ls = initWithString(L,contents)
+#     let cl = newLClosure(L,1)
+#     L.stack

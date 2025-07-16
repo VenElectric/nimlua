@@ -1,6 +1,6 @@
 import std/[lexbase, strformat, parseutils, strscans]
-from streams import newStringStream
-from strutils import Digits, IdentChars, Letters
+from streams import newStringStream,newFileStream
+from strutils import Digits, IdentChars, Letters,Whitespace
 
 
 type
@@ -38,20 +38,20 @@ type
         TK_NUMBER = "{NUMBER}"
         TK_NAME
         TK_STRING
-        TK_LESS = "<"
-        TK_GREATER = ">"
+        TK_LEFTPAREN = "("
+        TK_CARROT = "^"
+        TK_STAR = "*"
+        TK_SLASH = "/"
         TK_PLUS = "+"
         TK_MINUS = "-"
-        TK_SLASH = "/"
-        TK_STAR = "*"
+        TK_LESS = "<"
+        TK_GREATER = ">"
         TK_MOD = "%"
-        TK_CARROT = "^"
         TK_EQEQ = "=="
         TK_COMMA = ","
         TK_DOT = "."
         TK_SEMCOL = ";"
         TK_COLON = ":"
-        TK_LEFTPAREN = "("
         TK_RIGHTPAREN = ")"
         TK_LEFTBRACKET = "{"
         TK_RIGHTBRACKET = "}"
@@ -64,13 +64,12 @@ type
 
 type
     Token* = object
-        kind: TokenKind
-        lexeme: string
-        linenumber: int
+        kind*: TokenKind
+        lexeme*: string
+        linenumber*: int
     LexState* = object of BaseLexer
         lexeme: string
-        start: int
-        currentToken: Token
+        currentToken*: Token
     SyntaxError = object of CatchableError
 
 using
@@ -84,12 +83,11 @@ using
 
 proc initWithString*(contents: string): LexState =
     result = LexState()
-    result.lineNumber = 1
     result.open(newStringStream(contents))
 
 proc initWithFile*(fileName: string): LexState =
-    let contents = readFile(fileName)
-    result = initWithString(contents)
+  result = LexState()
+  result.open(newFileStream(fileName))
 
 func currentToken*(ls): Token = ls.currentToken
 
@@ -97,8 +95,8 @@ proc syntaxError(lineNum: int, msg: string) =
     raise newException(SyntaxError, fmt"{msg} | Line: {lineNum}")
 
 
-proc getReserved(lexeme: string): TokenKind =
-    case lexeme:
+proc getReserved(ls): TokenKind =
+    case ls.lexeme:
         of "and":
             result = TK_AND
         of "break":
@@ -146,7 +144,7 @@ func peek(l; pos: int = 0): char =
 
 func lineNumber*(l): int = l.lineNumber
 
-
+proc setLexeme*(ls;sPos,ePos:int) = ls.lexeme = substr(ls.buf,sPos,ePos)
 proc handleNewline(ls) =
     case peek(ls):
         of '\c': ls.bufpos = ls.handleCR(ls.bufpos)
@@ -155,29 +153,80 @@ proc handleNewline(ls) =
 
 proc skip(ls;steps: int = 1) = inc(ls.bufpos,steps)
 
-proc check(ls; lexeme: var string, ch: char): int =
-    result = 0
+# proc check(ls; lexeme: var string, ch: char): int =
+#     result = 0
 
-    if ch == peek(ls):
-        lexeme.add(ch)
-        inc(result)
+#     if ch == peek(ls):
+#         lexeme.add(ch)
+#         inc(result)
 
-proc check(ls;lexeme: var string,chars: set[char]): int =
-    result = 0
+# proc check(ls;lexeme: var string,chars: set[char]): int =
+#     result = 0
 
-    if peek(ls) in chars:
-        lexeme.add(ch)
-        inc(result)
+#     if peek(ls) in chars:
+#         lexeme.add(ch)
+#         inc(result)
 
-proc skipComment(ls): bool = scanp(ls.buf, ls.bufpos, "--", +(~'\L'),'\L')
+proc resetLexeme(ls) = ls.lexeme = ""
+
+proc skipComment(ls) =
+  let skipped = skipUntil(ls.buf,'\L',ls.bufpos)
+  if skipped > 0:
+    skip(ls,skipped)
+    handleNewline(ls)
+  else:
+    syntaxError(ls.linenumber,"Invalid Comment")
+    
+
+proc skipLongComment(ls) =
+  skip(ls,4) # skip --[[
+  var sliceStart = ls.bufpos
+  var sliceEnd = sliceStart + 4
+  while not isEOF(ls):
+    let slice = substr(ls.buf,sliceStart,sliceEnd)
+    if slice == "--]]":
+      skip(ls,4)
+      break
+    if peek(ls) in lexbase.Newlines:
+      handleNewline(ls)
+    else:
+      skip(ls)
+
+proc parseLongString(ls) =
+  skip(ls,2) # skip [[
+  let start = ls.bufpos
+  var sliceStart = ls.bufpos
+  var sliceEnd = sliceStart + 2
+  while not isEOF(ls):
+    let slice = substr(ls.buf,sliceStart,sliceEnd)
+    if slice == "]]":
+      skip(ls,2)
+      break
+    if peek(ls) in lexbase.Newlines:
+      handleNewline(ls)
+    else:
+      
+      skip(ls)
+  
+  if isEOF(ls):
+    syntaxError(ls.linenumber,"Unterminated long comment")
+  setLexeme(ls,start,ls.bufpos)
 
 
-proc skipLongComment(ls):bool = scanp(ls.buf, ls.bufpos, +(~{'-', '\0'}, '\L' -> handleNewline(ls)), "--]]")
-
-proc readLongString(ls): bool = scanp(ls.buf, ls.bufpos, "[[", +(~{']', '\0'} -> lexeme.add($_), '\L' -> handleNewline(ls)), "]]")
-
-
-proc readString(ls): bool = scanp(ls.buf, ls.bufpos, +(~{'\'', '"', '\L', '\0'} -> lexeme.add($_)), `quoteChar`)
+proc parseString(ls) =
+  let quoteChar = peek(ls)
+  skip(ls) # skip ' or "
+  let skipped = parseUntil(ls.buf,ls.lexeme,{quoteChar} + lexbase.Newlines,ls.bufpos)
+  if peek(ls) in lexbase.Newlines:
+    syntaxError(ls.linenumber,"Unterminated string")
+  
+  if peek(ls) != quoteChar:
+    syntaxError(ls.linenumber,fmt"Non matching string quotation. Expected: {quoteChar} but got: {peek(ls)}")
+  
+  if skipped > 0:
+    setLexeme(ls,ls.bufpos-skipped,ls.bufpos)
+  else:
+    syntaxError(ls.linenumber,"Unable to parse string")
 
 # float 5.0
 # exponent 5e+20
@@ -186,46 +235,31 @@ proc readString(ls): bool = scanp(ls.buf, ls.bufpos, +(~{'\'', '"', '\L', '\0'} 
     # countries that don't use '.'
     # potentially get entire lexeme before doing checks on whether ',' or '.
 
+proc parseNumeral(ls) =
+  var skipped = parseWhile(ls.buf,ls.lexeme,Digits + {'-','+','.','e'},ls.bufpos)
+  if skipped > 0:
+    skip(ls,skipped)
+  else:
+    syntaxError(ls.linenumber,"Unable to parse number")
 
-proc readNumeral(ls): bool = 
-    discard scanp(ls.buf,ls.bufpos,+(`Digits`,~'\L') -> ls.lexeme.add($_))
-    discard scanp(ls.buf,ls.bufpos,+(`Digits`,~'\L') -> ls.lexeme.add($_),check(ls,ls.lexeme,{'.',','}),+(`Digits`,~'\L') -> ls.lexeme.add($_))
-    discard scanp(ls.buf,ls.bufpos,+(`Digits`,~'\L') -> ls.lexeme.add($_),check(ls,ls.lexeme,'e'),check(ls,ls.lexeme,{'.',','}),+(`Digits`,~'\L') -> ls.lexeme.add($_))
-    scanp(ls.buf, ls.bufpos, +`Digits` -> lexeme.add($_), check(ls, lexeme,
-            '.'), (check(ls, lexeme, 'e'), (check(ls, lexeme, '+'), check(ls,
-            lexeme, '-'))), +`Digits` -> lexeme.add($_))
+proc parseVar(ls) =
+  let skipped = parseIdent(ls.buf, ls.lexeme, ls.bufpos)
+  if skipped > 0:
+    skip(ls,skipped)
+  else:
+    syntaxError(ls.linenumber,"Unable to parse variable")
 
-proc readVar(ls): bool = scanp(ls.buf, ls.bufpos, parseIdent(ls.buf, lexeme, ls.bufpos))
-
-
-proc get_char_literal_token(ch: char): TokenKind =
-
-    case ch:
-        of ',': result = TK_COMMA
-        of '(': result = TK_LEFTPAREN
-        of ')': result = TK_RIGHTPAREN
-        of ']': result = TK_LEFTSTAPLE
-        of '{': result = TK_LEFTBRACKET
-        of '}': result = TK_RIGHTBRACKET
-        of ';': result = TK_SEMCOL
-        of '#': result = TK_HASH
-        of '+': result = TK_PLUS
-        of '^': result = TK_CARROT
-        of '%': result = TK_MOD
-        of '*': result = TK_STAR
-        of '/': result = TK_SLASH
-        of ':': result = TK_COLON
-        of '-': result = TK_MINUS
-        of '=': result = TK_EQ
-        of '>': result = TK_GE
-        of '<': result = TK_LE
-        of '[': result = TK_RIGHTSTAPLE
-        else: result = TK_ERROR
 
 proc parseLiteral(ls): Token =
     var kind = TK_ERROR
+
     case peek(ls):
         of ',': kind = TK_COMMA
+        of '~': 
+          if peek(ls,1) == '=':
+            kind = TK_NE
+          else:
+            kind = TK_NOT
         of '(': kind = TK_LEFTPAREN
         of ')': kind = TK_RIGHTPAREN
         of ']': kind = TK_LEFTSTAPLE
@@ -238,18 +272,47 @@ proc parseLiteral(ls): Token =
         of '%': kind = TK_MOD
         of '*': kind = TK_STAR
         of '/': kind = TK_SLASH
-        of ':': 
-            if peek(ls,1) == ':':
-                skip(ls)
-                kind = TK_DBCOLON
-            else:
-                kind = TK_COLON
+        of ':':
+          if peek(ls,1) == ':':
+            kind = TK_DBCOLON
+          else:
+            kind = TK_COLON
         of '-': kind = TK_MINUS
-        of '=': kind = TK_EQ
-        of '>': kind = TK_GE
-        of '<': kind = TK_LE
+        of '=':
+          if peek(ls,1) == '=':
+            kind = TK_EQEQ
+          else:
+            kind = TK_EQ
+        of '>':
+          if peek(ls,1) == '=':
+            kind = TK_GE
+          else:
+            kind = TK_GREATER
+        of '<':
+          if peek(ls,1) == '=':
+            kind = TK_LE
+          else:
+            skip(ls)
+            kind = TK_LESS
         of '[': kind = TK_RIGHTSTAPLE
-        else: kind = TK_ERROR
+        of '.':
+          if peek(ls,1) == '.':
+            if peek(ls,2) == '.':
+              kind = TK_DOTS
+            else:
+              kind = TK_CONCAT
+          else:
+            kind = TK_DOT
+        else:
+          kind = TK_ERROR
+
+      # tk_le, tk_dots,tk_concat,tk_get,tk_eqeq,tk_dbcolon
+    if kind in {TK_LE,TK_DOTS,TK_CONCAT,TK_GE,TK_EQEQ,TK_DBCOLON,TK_NE}:
+      skip(ls,2)
+    elif kind == TK_DOTS:
+      skip(ls,3)
+    else:
+      skip(ls)
 
     if kind == TK_ERROR:
         syntaxError(ls.lineNumber,fmt"Invalid character {$peek(ls)}")
@@ -258,38 +321,60 @@ proc parseLiteral(ls): Token =
 
 
 
-const LITERALS = {',', '(', ')', ']', '{', '}', '+', '/', '*', ';', '#', '^',
-        '%', '.', '=', '>', '<', '-', '[', ':'}
+const LITERALS = {',', '(', ')', '{', '}', '+', '/', '*', ';', '#', '^',
+        '%', '.', '=', '>', '<', '-', ':','~','[',']'}
 
 
 proc getToken(ls): Token =
+    resetLexeme(ls)
+    
+    if isEOf(ls):
+      return createEOFToken(ls.linenumber)
+    
+    let skipped = skipWhitespace(ls.buf,ls.bufpos)
+    if skipped > 0:
+      skip(ls,skipped)
 
-    var tk: TokenKind = TK_ERROR
-
-    if scanp(ls.buf,ls.bufpos,'\L' -> handleNewline(ls)):
-        return getToken(ls)
-    if scanp(ls.buf,ls.bufpos,'\0'):
-        return createEOFToken(ls.linenumber)
-    elif scanp(ls.buf, ls.bufpos, "..." -> (tk = TK_DOTS),
-            ".." -> (tk = TK_CONCAT), '.' -> (tk = TK_DOT),
-            ">=" -> (tk = TK_GE), "<=" -> (tk = TK_LE),
-            "==" -> (tk = TK_EQEQ), "::" -> (tk = TK_DBCOLON)):
-        return createToken(ls.linenumber,tk,$tk)
-    elif scanp(ls.buf,ls.bufpos,"[["):
-        return readLongString(ls)
-    elif scanp(ls.buf, ls.bufpos, "--[[" -> skipLongComment(ls), "--" -> skipComment(ls)):
-        return getToken(ls)
-    elif scanp(ls.buf, ls.bufpos, `LITERALS` -> (tk = get_char_literal_token($_))):
-        return createToken(ls.lineNumber,tk,$tk)
-    elif scanp(ls.buf,ls.bufpos,{'\'','"'}):
-        return readString(ls)
-    elif peek(ls) in Digits:
-        return readNumeral(ls)
-    elif peek(ls) in IdentChars:
-        return readVar(ls)
-    else:
-        return createErrorToken(ls.linenumber,"Unhandled Lex Error")
+    if isEOF(ls):
+      result = createEOFToken(ls.linenumber)
+      
+    if peek(ls) in lexbase.Newlines:
+      handleNewline(ls)
+      return getToken(ls)
 
 
+    let ch = peek(ls)
+    case ch:
+      of '"','\'':
+        parseString(ls)
+        result = createToken(ls.linenumber,TK_STRING,ls.lexeme)
+      of Digits:
+        parseNumeral(ls)
+        result = createToken(ls.linenumber,TK_NUMBER,ls.lexeme)
+      of Literals:
+        if peek(ls) == '[' and peek(ls,1) == '[':
+          parseLongString(ls)
+          result = createToken(ls.linenumber,TK_STRING,ls.lexeme)
+        elif peek(ls) == '-' and peek(ls,1) == '-':
+          if peek(ls,2) == '[' and peek(ls,3) == '[':
+            skipLongComment(ls)
+            result = getToken(ls)
+          else:
+            skipComment(ls)
+            result = getToken(ls)
+        else:
+          result = parseLiteral(ls)
+      of Letters:
+        parseVar(ls)
+        result = createToken(ls.linenumber,getReserved(ls),ls.lexeme)
+      else:
+        syntaxError(ls.linenumber,fmt"Invalid character: {ch}")
 
 
+
+proc next*(ls) =
+  if isEOF(ls):
+    ls.currentToken = createEOFToken(ls.linenumber)
+    close(ls)
+  else:
+    ls.currentToken = getToken(ls)

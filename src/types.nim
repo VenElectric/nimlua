@@ -1,5 +1,4 @@
 import std/tables
-import lstate
 type 
     OpCodes* {.size: sizeof(uint8).} = enum
         OP_MOVE,
@@ -62,7 +61,8 @@ type
         LUA_TNIL
         LUA_TBOOLEAN
         LUA_TLIGHTUSERDATA
-        LUA_TNUMBER
+        LUA_TFLOAT
+        LUA_TINTEGER
         LUA_TSTRING
         LUA_TTABLE
         LUA_TFUNCTION
@@ -163,13 +163,13 @@ type
             of NClosure: n*: NimClosure
     LuaNumber* = distinct float64
     LuaString* = distinct string
-    LuaValue* = ref LuaValueBase
-    LuaValueBase* = object
+    LuaValue* {.acyclic.} = ref object
         case kind*: LuaValueKind
             of LUA_TNIL: discard
             of LUA_TBOOLEAN: boolv*:bool
             of LUA_TLIGHTUSERDATA: luserv*: UserData
-            of LUA_TNUMBER: numv*: LuaNumber
+            of LUA_TFLOAT: floatv*: LuaNumber
+            of LUA_TINTEGER: intv*: int64
             of LUA_TSTRING: strv*: LuaString
             of LUA_TTABLE: tablev*: LuaTable
             of LUA_TFUNCTION: funcv*: Closure
