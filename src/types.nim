@@ -161,15 +161,16 @@ type
         case kind*: ClosureKind
             of LClosure: l*: LuaClosure
             of NClosure: n*: NimClosure
-    LuaNumber* = distinct float64
+    LuaInteger* = distinct int64
+    LuaFloat* = distinct float64
     LuaString* = distinct string
     LuaValue* {.acyclic.} = ref object
         case kind*: LuaValueKind
             of LUA_TNIL: discard
             of LUA_TBOOLEAN: boolv*:bool
             of LUA_TLIGHTUSERDATA: luserv*: UserData
-            of LUA_TFLOAT: floatv*: LuaNumber
-            of LUA_TINTEGER: intv*: int64
+            of LUA_TFLOAT: floatv*: LuaFloat
+            of LUA_TINTEGER: intv*: LuaInteger
             of LUA_TSTRING: strv*: LuaString
             of LUA_TTABLE: tablev*: LuaTable
             of LUA_TFUNCTION: funcv*: Closure
