@@ -29,7 +29,7 @@ func kisUserData*(lv): bool = checkKind(lv.k,LUA_TUSERDATA)
 func kisThread*(lv): bool = checkKind(lv.k,LUA_TTHREAD)
 func kisProto*(lv): bool = checkKind(lv.k,LUA_TPROTO)
 
-converter toLBool*(v): bool = 
+converter toLBool*(lv): bool = 
     if checkKind(v.kind,LUA_TBOOLEAN):
         return v.boolv
     else:
@@ -39,7 +39,7 @@ converter toLInteger*(lv): LuaInteger =
     if checkKind(lv.kind,LUA_TINTEGER):
         return lv.intv
     else:
-        return LuaInteger(NaN)
+        return LuaInteger(0)
 
 converter toLFloat*(lv): LuaFloat =
     if checkKind(lv.kind,LUA_TFLOAT):
@@ -56,6 +56,9 @@ converter toLString*(lv): LuaString =
         return LuaString("")
 
 converter toString*(v:LuaString): string = string(v)
+
+
+
 
 
 

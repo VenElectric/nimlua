@@ -87,80 +87,10 @@ type
        OPR_OR
        OPR_NOBINOPR 
 type 
-    Instruction* = ref object
-        opcode*: OpCodes
-        case mode*: OpModes
-            of OMABC:
-                abc*: tuple[a,b,c:uint8]
-            of OMABx:
-                abx*: tuple[a:uint8,bx:uint16]
-            of OMAsBx:
-                asbx*: tuple[a:uint8,bx:int16]
-            of OMAx:
-                ax*: uint32
-    FuncState* = distinct pointer
-    ZIO* = distinct pointer
-    Dyndata* = distinct pointer
     LuaNimFunction* = proc(L:LuaState):int
-    LuaReader* = proc(l:LuaState,sz:int,ud:auto):string
-    LuaWriter* = proc(l:LuaState,p:pointer,sz:int,ud:auto):int
-    LuaAlloc* = proc(ud:auto,pt:pointer,osize:int,nsize:int)
-    LuaTable* = Table[string,LuaValue]
-    UserData* = ref LuaTable
-    CallInfo* = ref CallInfoBase
-    CallInfoBase =  object
-        fun*:int
-        top*:int
-        nresults*: int
-        callstatus*: uint8
-        previous*: CallInfo
-        next*: CallInfo
-        case kind*:ClosureKind
-            of LClosure: 
-                base*: int
-                code*: seq[Instruction]
-                savedpc*: int = 0
-            of NClosure: 
-                ctx*:int
-                k*: LuaNimFunction
-                old_errfunc*: int
-                old_allowhook*: uint8
-                status*: uint8
-    GlobalState* = object #placeholder
-    LuaState* = ref LuaStateBase
-    LuaStateBase* = object 
-        # CommonHeader;
-        status: uint8
-        # StkId top
-        LG: GlobalState
-        CI*: CallInfo
-        oldPC: uint32
-        stack: seq[LuaValue]
-        stacksize: int
-        nny: uint16
-        nCcalls: uint16
-        hookmask: uint8
-        allowhook: uint8
-        basehookcount: int
-        hookcount: int
-        errfunc: int64
-        base_ci: CallInfo
-    Proto* = ref ProtoBase
-    ProtoBase* = object 
-        constants*: seq[LuaValue]
-        code*: seq[Instruction]
-        prototypes*: seq[ref Proto]
-        upvalues*: seq[LuaValue]
-    NimClosure* = ref object
-        fun*:LuaNimFunction
-        upvalues*: seq[LuaValue]
-    LuaClosure* = ref object
-        proto*: Proto
-        upvalues*: seq[LuaValue]
-    Closure* = object
-        case kind*: ClosureKind
-            of LClosure: l*: LuaClosure
-            of NClosure: n*: NimClosure
+    LuaTable* = ref Table[string,LuaValue]
+    UserData* = ref object of RootObj
+    LuaState* = object of RootObj
     LuaInteger* = distinct int64
     LuaFloat* = distinct float64
     LuaString* = distinct string
@@ -173,9 +103,9 @@ type
             of LUA_TINTEGER: intv*: LuaInteger
             of LUA_TSTRING: strv*: LuaString
             of LUA_TTABLE: tablev*: LuaTable
-            of LUA_TFUNCTION: funcv*: Closure
+            of LUA_TFUNCTION: funcv*: int
             of LUA_TUSERDATA: userv*: UserData
             of LUA_TTHREAD: threadv*: LuaState
-            of LUA_TPROTO: protov*: Proto
+            of LUA_TPROTO: protov*: int
 
 # proc `savedpc=`(c:CallInfo,value:int) = c.savedpc 

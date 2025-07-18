@@ -1,5 +1,6 @@
 from llex import Token
 import types
+import lobject
 # expressions
     # Literal (nil|bool|int|float|string)
     # '...' variadic
@@ -82,7 +83,9 @@ type
                 fName*: string
                 fparams*: seq[Token]
                 fBody*: LuaStmt
-            of LKLabel,LKGoto,LKBreak:
+            of LKLabel:
+                label: string
+            of LKGoto,LKBreak:
                 goto*: int
             of LKDo:
                 doto*: int
@@ -94,3 +97,11 @@ type
                 elseBranch*: LuaExpr # need to support multiple branches
     LuaExpr = ref object
     LuaStmt = ref object
+
+
+proc newLiteral*(v:LuaInteger): LuaNode = LuaNode(kind: LKLiteral, literalv: newLInteger(v))
+proc newLiteral*(v:LuaFloat): LuaNode = LuaNode(kind: LKLiteral, literalv: newLFloat(v))
+proc newLiteral*(v:bool): LuaNode = LuaNode(kind: LKLiteral, literalv: newLBool(v))
+proc newLiteral*(v:string): LuaNode = LuaNode(kind: LKLiteral, literalv: newLString(LuaString(v)))
+proc newLiteral*(v:LuaTable): LuaNode = discard
+proc newLiteral*(): LuaNode = LuaNode(kind: LKLiteral, literalv: newLNil())

@@ -1,7 +1,26 @@
 import std/[strscans,strutils]
 import llex
 
+
+# type 
+#     UserData = ref object of RootObj
+#     MyTestData = ref object of UserData
+#       x,y: int
+#       b: string
+
 when isMainModule:
+  # let d = new MyTestData
+  # d.x = 0
+  # d.y = 1
+  # d.b = "hello userdata"
+
+  # var mySeq: seq[UserData] = @[]
+
+  # mySeq.add(d)
+  # var y = cast[MyTestData](mySeq[0])
+  # echo y.x
+  # echo y.y
+  # echo y.b
     var lex = initWithFile("test.lua")
     lex.next()
     

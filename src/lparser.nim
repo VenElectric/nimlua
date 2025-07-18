@@ -63,7 +63,12 @@ proc statement(ls) =
 
 
 
-proc statlist(ls) = discard
+proc statlist(ls) = 
+    while true:
+        if ls.currentToken.kind == TK_RETURN:
+            statement(ls)
+            break
+        statement(ls)
     # while not block_follow(ls,true):
     #     if ls.token.kind == TK_RETURN:
     #         statement(ls)
