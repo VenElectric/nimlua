@@ -1,4 +1,4 @@
-import llex,types,lfunc
+import llex,types
 import std/strformat
 
 const MAX_VARS = 200
@@ -24,7 +24,15 @@ type
 using
     ls:var LexState
 
-proc expression(ls) = discard
+func checkCurrentTokenKind(ls;kindB:TokenKind): bool = ls.currentToken.kind == kindB
+
+proc assignment(ls) = discard
+
+proc expression(ls) = 
+    if checkCurrentTokenKind(ls,TK_EQ) or checkCurrentTokenKind(ls,TK_COMMA):
+        discard
+    else:
+        discard
   
 proc returnstmt(ls) = discard
 
