@@ -1,5 +1,5 @@
-import std/[strscans,strutils]
-import llex
+import std/[options]
+import llex,lobject
 
 
 # type 
@@ -9,31 +9,19 @@ import llex
 #       b: string
 
 when isMainModule:
-  # let d = new MyTestData
-  # d.x = 0
-  # d.y = 1
-  # d.b = "hello userdata"
+  let x = newLInteger(92)
+  let y = newLFloat(90.0)
+  let z = x > y
+  if isSome(z):
+    echo "Um.. ",get(z).boolv
+  
+  let n = newLString("hello ")
+  let h = newLString("world")
+  let b = n .. h
+  if isSome(b):
+    echo "hmmm...",get(b).strv
 
-  # var mySeq: seq[UserData] = @[]
-
-  # mySeq.add(d)
-  # var y = cast[MyTestData](mySeq[0])
-  # echo y.x
-  # echo y.y
-  # echo y.b
-    var lex = initWithFile("test.lua")
-    lex.next()
-    
-    while lex.currentToken.kind != TK_EOF:
-      echo "Lexeme: ",lex.currentToken.lexeme
-      echo "Kind: ",lex.currentToken.kind
-      lex.next()
-      
-    # let buff = "print(899000.3e-2)"
-    # var pos = 6
-    # var lexeme = ""
-    # let r = scanp(buff,pos,(+`Digits`,?{'.',','},(*`Digits`,?'e',?{'+','-'},*`Digits`)) -> lexeme.add($_))
-    # echo "R is: ",r
-    # echo "lexeme: ",lexeme
-    
-    echo "done"
+  let axe = newLInteger(90)
+  let r = not axe
+  if isSome(r):
+    echo "result is: ",get(r).intv
