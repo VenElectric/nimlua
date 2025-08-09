@@ -2,16 +2,21 @@ import std/[lexbase, strformat, parseutils, strscans]
 from streams import newStringStream, newFileStream
 from strutils import Digits, IdentChars, Letters, Whitespace
 import token
-from state import LexState,LuaState
+
 
 # let NUM_RESERVED = int(TK_WHILE) - (FIRST_RESERVED + 1)
 
 type
     SyntaxError = object of CatchableError
 
+type
+    LexState* = object of BaseLexer
+        lexeme*: string = ""
+        currentToken*: Token
+        tokens*: seq[Token] = @[]
+
 using
     ls: var LexState
-    L: var LuaState
 
 
 # const NewLineChars = {'\r', '\n', '\c'}
@@ -294,18 +299,13 @@ proc getToken(ls): Token =
 
 proc next(ls) =
     if isEOF(ls):
-        ls.currentToken = createEOFToken(ls.linenumber)
+        ls.tokens.add(createEOFToken(ls.linenumber))
         close(ls)
     else:
-        ls.currentToken = getToken(ls)
+        ls.tokens.add(getToken(ls))
 
-proc initLexer(buff: string): LexState =
-    result = LexState()
-    result.open(newStringStream(buff))
-
-proc lex*(L; buff: string) =
-    L.lexer = initLexer(buff)
-    next(L.lexer)
-    while L.lexer.currentToken.kind != TK_EOF:
-        L.lexer.tokens.add(L.lexer.currentToken)
-        next(L.lexer)
+proc lex*(ls) =
+    next(ls)
+    while ls.currentToken.kind != TK_EOF:
+        ls.tokens.add(ls.currentToken)
+        next(ls)

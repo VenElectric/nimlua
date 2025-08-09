@@ -1,27 +1,21 @@
-import std/[options]
-import llex,lobject
 
 
-# type 
-#     UserData = ref object of RootObj
-#     MyTestData = ref object of UserData
-#       x,y: int
-#       b: string
+
+type 
+    UserData = ref object of RootObj
+    MyTestData = ref object of UserData
+      x,y: int
+      b: string
+
+method test(m:UserData) {.base.} = discard
+
+method test(m:MyTestData) = 
+  echo m.x
+  echo "hello world"
+
+proc useTest(m:UserData) = test(m)
 
 when isMainModule:
-  let x = newLInteger(92)
-  let y = newLFloat(90.0)
-  let z = x > y
-  if isSome(z):
-    echo "Um.. ",get(z).boolv
-  
-  let n = newLString("hello ")
-  let h = newLString("world")
-  let b = n .. h
-  if isSome(b):
-    echo "hmmm...",get(b).strv
-
-  let axe = newLInteger(90)
-  let r = not axe
-  if isSome(r):
-    echo "result is: ",get(r).intv
+  echo "test"
+  let mtd = MyTestData(x:1,y:2,b:"ugh")
+  useTest(mtd)

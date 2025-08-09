@@ -44,17 +44,17 @@ type
             of EKUnary:
                 unary: UnaryExpr
 
+proc evaluate(b:BinaryExpr): LuaValue
+proc evaluate(u:UnaryExpr): LuaValue
+proc evaluate(stm:Statement): Expression
 proc evaluate(exp:Expression):LuaValue
-proc evaluate(s:Statement): LuaValue
 
-proc expect(l,r:StmtKind) = discard
 
 proc add*(parent:Statement,child:Statement) =
     expect(parent.kind,STBlock)
     parent.body.add(child)
 
 proc newExpression(kind:ExprKind): Expression = 
-    result = new Expression
     result.kind = kind
 
 proc newLiteralImpl(): Expression = result = newExpression(EKLiteral)
@@ -83,12 +83,11 @@ proc newBinary*(lhs,rhs:Expression,op:Token): Expression =
     result = newExpression(EKBinary)
     result.binary = BinaryExpr(left:lhs,right:rhs,op:op)
 
-proc newUnary*(rhs:Expression,op:char): Expression = 
+proc newUnary*(rhs:Expression,op:Token): Expression = 
     result = newExpression(EKUnary)
     result.unary = UnaryExpr(right:rhs,op:op)
 
-proc newStatement(kind:StmtKind): Statement =
-    result = new Statement
+proc newStatement(kind:StmtKind): Statement = 
     result.kind = kind
 
 proc newBlock*(): Statement =
@@ -101,131 +100,69 @@ proc newExpressionStmt*(exp:Expression): Statement =
 
 proc evaluate(v:LuaValue): LuaValue = v
 
+template binop(op:untyped):untyped = 
+    let total = `op`(lhs,rhs)
+    if isSome(total):
+        result = get(total)
+    else:
+        result = newLNil()
+
 proc evaluate(b:BinaryExpr): LuaValue = 
     let lhs = evaluate(b.left)
     let rhs = evaluate(b.right)
     let op = b.op.kind
     case op:
         of TK_PLUS: 
-            let total = lhs + rhs
-            if isSome(total):
-                result = get(total)
-            else:
-                result = newLNil()
+            binop(`+`)
         of TK_MINUS: 
-            let total = lhs - rhs
-            if isSome(total):
-                result = get(total)
-            else:
-                result = newLNil()
+            binop(`-`)
         of TK_STAR:
-            let total = lhs * rhs
-            if isSome(total):
-                result = get(total)
-            else:
-                result = newLNil()
+            binop(`*`)
         of TK_SLASH:
-            let total = lhs / rhs
-            if isSome(total):
-                result = get(total)
-            else:
-                result = newLNil()
+            binop(`/`)
         of TK_DBSLASH:
-            let total = lhs // rhs
-            if isSome(total):
-                result = get(total)
-            else:
-                result = newLNil()
+            binop(`//`)
         of TK_AND,TK_BAND:
-            let total = lhs and rhs
-            if isSome(total):
-                result = get(total)
-            else:
-                result = newLNil()
+            binop(`and`)
         of TK_OR,TK_BOR:
-            let total = lhs or rhs
-            if isSome(total):
-                result = get(total)
-            else:
-                result = newLNil()
+            binop(`or`)
         of TK_CONCAT:
-            let total = lhs .. rhs
-            if isSome(total):
-                result = get(total)
-            else:
-                result = newLNil()
+            binop(`..`)
         of TK_EQEQ:
-            let total = lhs == rhs
-            if isSome(total):
-                result = get(total)
-            else:
-                result = newLNil()
+            binop(`==`)
         of TK_LESS:
-            let total = lhs < rhs
-            if isSome(total):
-                result = get(total)
-            else:
-                result = newLNil()
+            binop(`<`)
         of TK_LE:
-            let total = lhs <= rhs
-            if isSome(total):
-                result = get(total)
-            else:
-                result = newLNil()
+            binop(`<=`)
         of TK_GREATER:
-            let total = lhs > rhs
-            if isSome(total):
-                result = get(total)
-            else:
-                result = newLNil()
+            binop(`>`)
         of TK_GE:
-            let total = lhs >= rhs
-            if isSome(total):
-                result = get(total)
-            else:
-                result = newLNil()
+            binop(`>=`)
         of TK_CARROT:
-            let total = pow(lhs,rhs)
-            if isSome(total):
-                result = get(total)
-            else:
-                result = newLNil()
+            binop(`pow`)
         of TK_MOD:
-            let total = `mod`(lhs,rhs)
-            if isSome(total):
-                result = get(total)
-            else:
-                result = newLNil()
+            binop(`mod`)
         of TK_NE:
-            let total = lhs ~= rhs
-            if isSome(total):
-                result = get(total)
-            else:
-                result = newLNil()
+            binop(`~=`)
         else: discard
+
+template unop(op:untyped):untyped =
+    let r = `op`(rhs)
+    if isSome(r):
+        result = get(r)
+    else:
+        result = newLNil()
 
 proc evaluate(u:UnaryExpr): LuaValue =
     let rhs = evaluate(u.right)
     let op = u.op
     case op.kind:
         of TK_HASH: 
-            let r = len(rhs)
-            if isSome(r):
-                result = get(r)
-            else:
-                result = newLNil()
+            unop(`len`)
         of TK_MINUS: 
-            let r = `-`(rhs)
-            if isSome(r):
-                result = get(r)
-            else:
-                result = newLNil()
+            unop(`-`)
         of TK_NOT:
-            let r = `not`(rhs)
-            if isSome(r):
-                result = get(r)
-            else:
-                result = newLNil()
+            unop(`not`)
         else: discard
 
 proc evaluate(exp:Expression):LuaValue = 
@@ -233,11 +170,14 @@ proc evaluate(exp:Expression):LuaValue =
     case kind:
         of EKBinary: result = evaluate(exp.binary)
         of EKUnary: result = evaluate(exp.unary)
-        else: discard
+        of EKLiteral: result = evaluate(exp.literal)
 
-proc evaluate(stm:Statement): Expression =
+proc evaluate(body:DoublyLinkedList[Statement]) = 
+    for b in items(body):
+        discard evaluate(b)
+
+proc evaluate(stm:Statement) =
     let kind = stm.kind
     case kind:
-        of STBlock: discard
-        of STExpression: discard
-        else: discard
+        of STBlock: evaluate(stm.body)
+        of STExpression: discard evaluate(stm.expression)

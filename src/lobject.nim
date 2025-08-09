@@ -1,5 +1,5 @@
 import std/[tables,math,options]
-import todo
+
 
 type
     LuaValueKind* = enum
@@ -10,43 +10,23 @@ type
         LUA_TSTRING
         LUA_TTABLE
         LUA_TFUNCTION
-    MetaKeys* = enum 
-        MADD = "__add"
-        MSUB = "__sub"
-        MMUL = "__mul"
-        MDIV = "__div"
-        MUNM = "__unm"
-        MMOD = "__mod"
-        MPOW = "__pow"
-        MIDIV = "__idiv"
-        MBAND = "__band"
-        MBOR = "__bor"
-        MBXOR = "__bxor"
-        MBNOT = "__bnot"
-        MSHL = "__shl"
-        MSHR = "__shr"
-        MEQ = "__eq"
-        MLE = "__le"
-        MLT = "__lt"
-        MCONCAT = "__concat"
-        MLEN = "__len"
-        MINDEX = "__index"
-        MNEWINDEX = "__newindex"
-        MCALL = "__call"
-        MSTR = "__tostring"
-        MPAIRS = "__pairs"
-        MIPAIRS = "__ipairs"
 
 
 # const MetaKeysStr = ["__add", "__sub", "__mul", "__div", "__unm", "__mod", "__pow",
 #         "__idiv", "__band", "__bor", "__bxor", "__bnot", "__shl", "__shr",
 #         "__eq", "__lt", "__le", "__concat","__len","__index","__newindex","__call","__tostring","__pairs","__ipairs"]
 
+# remove metatable from LuaValue object and make them separate entities
+# when parsing, need to lookup metatable for type
+# IntMeta,FloatMeta, etc....
+# each table has their own metatable?
+# don't think that functions need a metatable, right?
+
 type
     ValueError = object of CatchableError
     LuaTable* = Table[string, LuaValue]
     NimFunction* = proc(args: varargs[LuaValue]): LuaValue
-    LuaValue* {.acyclic.} = ref object of MetaBase
+    LuaValue* {.acyclic.} = ref object
         case kind*: LuaValueKind
             of LUA_TNIL: discard
             of LUA_TBOOLEAN: boolv*: bool
@@ -55,15 +35,30 @@ type
             of LUA_TSTRING: strv*: string
             of LUA_TTABLE: tablev*: LuaTable
             of LUA_TFUNCTION: funcv*: NimFunction
-    MetaTable* = Table[string, NimFunction]
-    MetaBase* = ref object of RootObj
-        metatable*: MetaTable
 
 using
+    mt: MetaTable
+    vmt: var MetaTable
     lv: LuaValue
     lvk: LuaValueKind
+    lt: LuaTable
+    vlt: var LuaTable
+
+
+
+proc newLFunction*(v:NimFunction): LuaValue
+
+converter toFloat64*(v:int64):float64 = float64(v)
 
 func k*(lv): LuaValueKind = lv.kind
+
+func check(lv;kind:LuaValueKind): bool = lv.k == kind
+
+proc expect*(lv;kind:LuaValueKind) = 
+    if not check(lv,kind):
+        raise newException(ValueError,"Expected: " & $kind & " but got: " & $lv.k)
+
+
 
 func check*(one, two: LuaValueKind): bool = one == two
 
@@ -78,12 +73,6 @@ proc expect*(expected, compare: LuaValueKind,message:string) =
 proc expect*(expected:LuaValueKind, compare: set[LuaValueKind],message:string) =
     if expected notin compare:
         raise newException(CatchableError, message)
-
-# proc newLuaValue(kind: LuaValueKind): LuaValue =
-#     result = new LuaValue
-#     result.kind = kind
-
-proc getMetatable(o:MetaBase): MetaTable = o.metatable
 
 proc newLNil*(): LuaValue =
     result = LuaValue(kind:LUA_TNIL)
@@ -101,6 +90,9 @@ proc newLString*(v: string): LuaValue =
     result = LuaValue(kind:LUA_TSTRING,strv: v)
 
 proc newLTable*(v: LuaTable): int = discard
+
+proc newLFunction*(v:NimFunction): LuaValue =
+    result = LuaValue(kind:LUA_TFUNCTION,funcv: v)
 
 
 func kisNil*(lv): bool = check(lv.k, LUA_TNIL)
@@ -131,22 +123,22 @@ proc getTable*(lv): LuaTable =
     expect(lv.k, LUA_TTABLE,"Invalid Kind")
     result = lv.tablev
 
-converter toFloat64*(v:int64):float64 = float64(v)
 
+proc `[]`*(tab:LuaValue,key:string): LuaValue = 
+    expect(tab.k,LUA_TTABLE,"Expected table, but got: " & $tab.k)
+    result = tab.tablev[key]
 
-proc newMetaTable*(methods:openArray[tuple[key:MetaKeys,fn:NimFunction]]): MetaTable = 
-    result = initTable[string,NimFunction](len(methods))
-    for m in methods:
-        let key = m.key
-        let fn = m.fn
-        result[$key] = fn
+proc `[]=`*(tab:LuaValue,key:string,value:sink LuaValue) = 
+    expect(tab.k,LUA_TTABLE,"Expected table, but got: " & $tab.k)
+    tab.tablev[key] = value
 
-func hasKey(t:MetaTable,key:string): bool = result = key in t
-# proc metatable_check(mt:MetaTable,key:MetaKeys,args:varargs[LuaValue]): Option[LuaValue] =
-#     result = none(LuaValue)
-#     if hasKey(mt,$key):
-#         let fn = mt[$key]
-#         result = some(fn(args))
+proc `[]`*(tab:LuaValue,key:int): LuaValue = 
+    expect(tab.k,LUA_TTABLE,"Expected table, but got: " & $tab.k)
+    result = tab.tablev[$key]
+
+proc `[]=`*(tab:LuaValue,key:int,value:sink LuaValue) = 
+    expect(tab.k,LUA_TTABLE,"Expected table, but got: " & $tab.k)
+    tab.tablev[$key] = value
 
 func truthiness(v:LuaValue): bool = 
     if kisNil(v):
@@ -156,197 +148,197 @@ func truthiness(v:LuaValue): bool =
     else:
         return true
 
-proc try_metatable(lhs,rhs:LuaValue,key:MetaKeys): Option[LuaValue] =
-    let lhsMeta = getMetatable(lhs)
-    let rhsMeta = getMetatable(rhs)
-    if hasKey(lhsMeta,$key):
-        let fn = lhsMeta[$key]
-        result = some(fn(lhs,rhs))
-    elif hasKey(rhsMeta,$key):
-        let fn = rhsMeta[$key]
-        result = some(fn(rhs,lhs))
-    else:
-        result = none(LuaValue)
+# proc try_metatable(lhs,rhs:LuaValue,key:MetaKeys): Option[LuaValue] =
+#     let lhsMeta = getMetatable(lhs)
+#     let rhsMeta = getMetatable(rhs)
+#     if hasKey(lhsMeta,$key):
+#         let fn = lhsMeta[key]
+#         result = some(fn(lhs,rhs))
+#     elif hasKey(rhsMeta,key):
+#         let mm = getMetaMethod(rhsMeta,key)
+#         result = some(fn(rhs,lhs))
+#     else:
+#         result = none(LuaValue)
 
-proc try_metatable(rhs:LuaValue,key:MetaKeys): Option[LuaValue] =
-    let rhsMeta = getMetatable(rhs)
-    if hasKey(rhsMeta,$key):
-        let fn = rhsMeta[$key]
-        result = some(fn(rhs))
-    else:
-        result = none(LuaValue)
+# proc try_metatable(rhs:LuaValue,key:MetaKeys): Option[LuaValue] =
+#     let rhsMeta = getMetatable(rhs)
+#     if hasKey(rhsMeta,$key):
+#         let fn = rhsMeta[$key]
+#         result = some(fn(rhs))
+#     else:
+#         result = none(LuaValue)
 
 
-template binop(lhs,rhs:LuaValue,key:MetaKeys,op:untyped):untyped = 
-    result = none(LuaValue)
-    if kisInteger(lhs) and kisInteger(rhs):
-        result = some(newLInteger(`op`(lhs.intv,rhs.intv)))
-    elif kisInteger(lhs) and kisFloat(rhs):
-        result = some(newLFloat(`op`(lhs.intv,rhs.floatv)))
-    elif kisFloat(lhs) and kisInteger(rhs):
-        result = some(newLFloat(`op`(lhs.floatv , rhs.intv)))
-    elif kisFloat(lhs) and kisFloat(rhs):
-        result = some(newLFloat(`op`(lhs.floatv,rhs.floatv)))
-    else:
-        result = try_metatable(lhs,rhs,key)
+# template binop(lhs,rhs:LuaValue,key:MetaKeys,op:untyped):untyped = 
+#     result = none(LuaValue)
+#     if kisInteger(lhs) and kisInteger(rhs):
+#         result = some(newLInteger(`op`(lhs.intv,rhs.intv)))
+#     elif kisInteger(lhs) and kisFloat(rhs):
+#         result = some(newLFloat(`op`(lhs.intv,rhs.floatv)))
+#     elif kisFloat(lhs) and kisInteger(rhs):
+#         result = some(newLFloat(`op`(lhs.floatv , rhs.intv)))
+#     elif kisFloat(lhs) and kisFloat(rhs):
+#         result = some(newLFloat(`op`(lhs.floatv,rhs.floatv)))
+#     else:
+#         result = try_metatable(lhs,rhs,key)
 
-template integerbinop(lhs,rhs:LuaValue,key:MetaKeys,op:untyped):untyped = 
-    result = none(LuaValue)
-    if kisInteger(lhs) and kisInteger(rhs):
-        result = some(newLInteger(`op`(lhs.intv,rhs.intv)))
-    else:
-        result = try_metatable(lhs,rhs,key)
+# template integerbinop(lhs,rhs:LuaValue,key:MetaKeys,op:untyped):untyped = 
+#     result = none(LuaValue)
+#     if kisInteger(lhs) and kisInteger(rhs):
+#         result = some(newLInteger(`op`(lhs.intv,rhs.intv)))
+#     else:
+#         result = try_metatable(lhs,rhs,key)
 
-template compbinop(lhs,rhs:LuaValue,key:MetaKeys,op:untyped): untyped = 
-    result = none(LuaValue)
-    if check(lhs.k,rhs.k):
-        if kisInteger(lhs):
-            result = some(newLBool(`op`(lhs.intv,rhs.intv)))
-        elif kisFloat(lhs):
-            result = some(newLBool(`op`(lhs.floatv,rhs.floatv)))
-        elif kisString(lhs):
-            result = some(newLBool(`op`(lhs.strv,rhs.strv)))
-        elif kisBool(lhs):
-            result = some(newLBool(`op`(lhs.boolv,rhs.boolv)))
-        elif kisNil(lhs):
-            result = some(newLBool(true))
-        elif kisTable(lhs):
-            result = try_metatable(lhs,rhs,key)
-        else:
-            result = some(newLBool(false))
-    else:
-        if kisFloat(lhs) and kisInteger(rhs):
-            result = some(newLBool(`op`(lhs.floatv,rhs.intv)))
-        elif kisInteger(lhs) and kisFloat(rhs):
-            result = some(newLBool(`op`(lhs.intv,rhs.floatv)))
-        else:
-            result = try_metatable(lhs,rhs,key)
+# template compbinop(lhs,rhs:LuaValue,key:MetaKeys,op:untyped): untyped = 
+#     result = none(LuaValue)
+#     if check(lhs.k,rhs.k):
+#         if kisInteger(lhs):
+#             result = some(newLBool(`op`(lhs.intv,rhs.intv)))
+#         elif kisFloat(lhs):
+#             result = some(newLBool(`op`(lhs.floatv,rhs.floatv)))
+#         elif kisString(lhs):
+#             result = some(newLBool(`op`(lhs.strv,rhs.strv)))
+#         elif kisBool(lhs):
+#             result = some(newLBool(`op`(lhs.boolv,rhs.boolv)))
+#         elif kisNil(lhs):
+#             result = some(newLBool(true))
+#         elif kisTable(lhs):
+#             result = try_metatable(lhs,rhs,key)
+#         else:
+#             result = some(newLBool(false))
+#     else:
+#         if kisFloat(lhs) and kisInteger(rhs):
+#             result = some(newLBool(`op`(lhs.floatv,rhs.intv)))
+#         elif kisInteger(lhs) and kisFloat(rhs):
+#             result = some(newLBool(`op`(lhs.intv,rhs.floatv)))
+#         else:
+#             result = try_metatable(lhs,rhs,key)
 
-template unop(rhs:LuaValue,key:MetaKeys,op:untyped): untyped =
-    result = none(LuaValue)
-    if kisInteger(rhs):
-        result = some(newLInteger(`op`(rhs.intv)))
-    elif kisFloat(rhs):
-        result = some(newLFloat(`op`(rhs.floatv)))
-    else:
-        result = try_metatable(rhs,key)
+# template unop(rhs:LuaValue,key:MetaKeys,op:untyped): untyped =
+#     result = none(LuaValue)
+#     if kisInteger(rhs):
+#         result = some(newLInteger(`op`(rhs.intv)))
+#     elif kisFloat(rhs):
+#         result = some(newLFloat(`op`(rhs.floatv)))
+#     else:
+#         result = try_metatable(rhs,key)
 
-template logicunop(rhs:LuaValue,key:MetaKeys,op:untyped): untyped =
-    result = none(LuaValue)
-    if kisInteger(rhs):
-        result = some(newLInteger(`op`(rhs.intv)))
-    elif kisBool(rhs):
-        result = some(newLBool(`op`(rhs.boolv)))
-    else:
-        result = try_metatable(rhs,key)
+# template logicunop(rhs:LuaValue,key:MetaKeys,op:untyped): untyped =
+#     result = none(LuaValue)
+#     if kisInteger(rhs):
+#         result = some(newLInteger(`op`(rhs.intv)))
+#     elif kisBool(rhs):
+#         result = some(newLBool(`op`(rhs.boolv)))
+#     else:
+#         result = try_metatable(rhs,key)
 
-template logicbinop(lhs,rhs:LuaValue,key:MetaKeys,op:untyped):untyped =
-    result = none(LuaValue)
-    if check(lhs.k,rhs.k):
-        if kisInteger(lhs):
-            result = some(newLInteger(`op`(lhs.intv,rhs.intv)))
-        elif kisBool(lhs):
-            result = some(newLBool(`op`(lhs.boolv,rhs.boolv)))
-        else:
-            result = try_metatable(rhs,key)
-    else:
-        result = try_metatable(rhs,key)
+# template logicbinop(lhs,rhs:LuaValue,key:MetaKeys,op:untyped):untyped =
+#     result = none(LuaValue)
+#     if check(lhs.k,rhs.k):
+#         if kisInteger(lhs):
+#             result = some(newLInteger(`op`(lhs.intv,rhs.intv)))
+#         elif kisBool(lhs):
+#             result = some(newLBool(`op`(lhs.boolv,rhs.boolv)))
+#         else:
+#             result = try_metatable(rhs,key)
+#     else:
+#         result = try_metatable(rhs,key)
 
-proc len*(v:LuaValue): Option[LuaValue] =
-    case v.k:
-        of LUA_TFLOAT,LUA_TINTEGER,LUA_TNIL: discard # raise (?)
-        of LUA_TSTRING: result = some(newLInteger(len(v.strv)))
-        of LUA_TTABLE: result = some(newLInteger(len(v.tablev)))
-        else: discard # raise (?)
+# proc len*(v:LuaValue): Option[LuaValue] =
+#     case v.k:
+#         of LUA_TFLOAT,LUA_TINTEGER,LUA_TNIL: discard # raise (?)
+#         of LUA_TSTRING: result = some(newLInteger(len(v.strv)))
+#         of LUA_TTABLE: result = some(newLInteger(len(v.tablev)))
+#         else: discard # raise (?)
 
-# float or integer
-proc `+`*(lhs,rhs:LuaValue): Option[LuaValue] = binop(lhs,rhs,MADD,`+`)
+# # float or integer
+# proc `+`*(lhs,rhs:LuaValue): Option[LuaValue] = binop(lhs,rhs,MADD,`+`)
     
-# float or integer
-proc `-`*(lhs,rhs:LuaValue): Option[LuaValue] = binop(lhs,rhs,MSUB,`-`)
+# # float or integer
+# proc `-`*(lhs,rhs:LuaValue): Option[LuaValue] = binop(lhs,rhs,MSUB,`-`)
 
-# division returns a float
-proc `/`*(lhs,rhs:LuaValue): Option[LuaValue] = integerbinop(lhs,rhs,MDIV,`div`)
+# # division returns a float
+# proc `/`*(lhs,rhs:LuaValue): Option[LuaValue] = integerbinop(lhs,rhs,MDIV,`div`)
 
-# float or integer
-proc `*`*(lhs,rhs:LuaValue): Option[LuaValue] = binop(lhs,rhs,MADD,`*`)
+# # float or integer
+# proc `*`*(lhs,rhs:LuaValue): Option[LuaValue] = binop(lhs,rhs,MADD,`*`)
 
-# integer
-proc `//`*(lhs,rhs:LuaValue): Option[LuaValue] = integerbinop(lhs,rhs,MDIV,floorDiv)
+# # integer
+# proc `//`*(lhs,rhs:LuaValue): Option[LuaValue] = integerbinop(lhs,rhs,MDIV,floorDiv)
 
-#integer
-proc `mod`*(lhs,rhs:LuaValue): Option[LuaValue] = integerbinop(lhs,rhs,MDIV,floorDiv)
-
-
-proc `==`*(lhs,rhs:LuaValue): Option[LuaValue] = 
-    compbinop(lhs,rhs,MEQ,`==`)
-
-proc `~=`*(lhs,rhs:LuaValue): Option[LuaValue] = 
-    compbinop(lhs,rhs,MEQ,`!=`)
-
-proc `<`*(lhs,rhs:LuaValue): Option[LuaValue] = 
-    compbinop(lhs,rhs,MEQ,`<`)
-
-proc `<=`*(lhs,rhs:LuaValue):Option[LuaValue] = 
-    compbinop(lhs,rhs,MEQ,`<=`)
-
-proc `>`*(lhs,rhs:LuaValue): Option[LuaValue] = 
-    compbinop(lhs,rhs,MEQ,`>`)
-
-proc `>=`*(lhs,rhs:LuaValue): Option[LuaValue] = 
-    compbinop(lhs,rhs,MEQ,`>=`)
-
-proc pow*(lhs,rhs:LuaValue): Option[LuaValue] = 
-    result = none(LuaValue)
-    if kisInteger(lhs) and kisInteger(rhs):
-        result = some(newLFloat(pow(lhs.intv,rhs.intv)))
-    elif kisInteger(lhs) and kisFloat(rhs):
-        result = some(newLFloat(pow(lhs.intv,rhs.floatv)))
-    elif kisFloat(lhs) and kisInteger(rhs):
-        result = some(newLFloat(pow(lhs.floatv , rhs.intv)))
-    elif kisFloat(lhs) and kisFloat(rhs):
-        result = some(newLFloat(pow(lhs.floatv,rhs.floatv)))
-    else:
-        result = try_metatable(lhs,rhs,MPOW)
+# #integer
+# proc `mod`*(lhs,rhs:LuaValue): Option[LuaValue] = integerbinop(lhs,rhs,MDIV,floorDiv)
 
 
+# proc `==`*(lhs,rhs:LuaValue): Option[LuaValue] = 
+#     compbinop(lhs,rhs,MEQ,`==`)
 
-proc `-`*(rhs:LuaValue): Option[LuaValue] = 
-    unop(rhs,MUNM,`-`)
+# proc `~=`*(lhs,rhs:LuaValue): Option[LuaValue] = 
+#     compbinop(lhs,rhs,MEQ,`!=`)
 
-proc `and`*(lhs,rhs:LuaValue): Option[LuaValue] = 
-    logicbinop(lhs,rhs,MBAND,`and`)
+# proc `<`*(lhs,rhs:LuaValue): Option[LuaValue] = 
+#     compbinop(lhs,rhs,MEQ,`<`)
 
-proc `or`*(lhs,rhs:LuaValue): Option[LuaValue] = 
-    logicbinop(lhs,rhs,MBOR,`or`)
+# proc `<=`*(lhs,rhs:LuaValue):Option[LuaValue] = 
+#     compbinop(lhs,rhs,MEQ,`<=`)
 
-proc `xor`*(lhs,rhs:LuaValue): Option[LuaValue] = 
-    logicbinop(lhs,rhs,MBXOR,`xor`)
+# proc `>`*(lhs,rhs:LuaValue): Option[LuaValue] = 
+#     compbinop(lhs,rhs,MEQ,`>`)
 
-proc `shr`*(lhs,rhs:LuaValue): Option[LuaValue] = 
-    integerbinop(lhs,rhs,MSHR,`shr`)
+# proc `>=`*(lhs,rhs:LuaValue): Option[LuaValue] = 
+#     compbinop(lhs,rhs,MEQ,`>=`)
 
-proc `shl`*(lhs,rhs:LuaValue): Option[LuaValue] = 
-    integerbinop(lhs,rhs,MSHL,`shl`)
+# proc pow*(lhs,rhs:LuaValue): Option[LuaValue] = 
+#     result = none(LuaValue)
+#     if kisInteger(lhs) and kisInteger(rhs):
+#         result = some(newLFloat(pow(lhs.intv,rhs.intv)))
+#     elif kisInteger(lhs) and kisFloat(rhs):
+#         result = some(newLFloat(pow(lhs.intv,rhs.floatv)))
+#     elif kisFloat(lhs) and kisInteger(rhs):
+#         result = some(newLFloat(pow(lhs.floatv , rhs.intv)))
+#     elif kisFloat(lhs) and kisFloat(rhs):
+#         result = some(newLFloat(pow(lhs.floatv,rhs.floatv)))
+#     else:
+#         result = try_metatable(lhs,rhs,MPOW)
 
-proc `not`*(rhs:LuaValue): Option[LuaValue] = 
-    logicunop(rhs,MBNOT,`not`)
 
-proc `..`*(lhs,rhs:LuaValue): Option[LuaValue] = 
-    if check(lhs.k,rhs.k) and kisString(lhs):
-        result = some(newLString(lhs.strv & rhs.strv))
-    else:
-        result = try_metatable(lhs,rhs,MCONCAT)
 
-proc call*(o:LuaValue,args:varargs[LuaValue]): Option[LuaValue] =
-    result = none(LuaValue)
-    if check(o.k,LUA_TFUNCTION):
-        discard
-    else:
-        let meta = getMetatable(o)
-        if hasKey(meta,$MCALL):
-            let fn = meta[$MCALL]
-            result = some(fn(args))
+# proc `-`*(rhs:LuaValue): Option[LuaValue] = 
+#     unop(rhs,MUNM,`-`)
+
+# proc `and`*(lhs,rhs:LuaValue): Option[LuaValue] = 
+#     logicbinop(lhs,rhs,MBAND,`and`)
+
+# proc `or`*(lhs,rhs:LuaValue): Option[LuaValue] = 
+#     logicbinop(lhs,rhs,MBOR,`or`)
+
+# proc `xor`*(lhs,rhs:LuaValue): Option[LuaValue] = 
+#     logicbinop(lhs,rhs,MBXOR,`xor`)
+
+# proc `shr`*(lhs,rhs:LuaValue): Option[LuaValue] = 
+#     integerbinop(lhs,rhs,MSHR,`shr`)
+
+# proc `shl`*(lhs,rhs:LuaValue): Option[LuaValue] = 
+#     integerbinop(lhs,rhs,MSHL,`shl`)
+
+# proc `not`*(rhs:LuaValue): Option[LuaValue] = 
+#     logicunop(rhs,MBNOT,`not`)
+
+# proc `..`*(lhs,rhs:LuaValue): Option[LuaValue] = 
+#     if check(lhs.k,rhs.k) and kisString(lhs):
+#         result = some(newLString(lhs.strv & rhs.strv))
+#     else:
+#         result = try_metatable(lhs,rhs,MCONCAT)
+
+# proc call*(o:LuaValue,args:varargs[LuaValue]): Option[LuaValue] =
+#     result = none(LuaValue)
+#     if check(o.k,LUA_TFUNCTION):
+#         discard
+#     else:
+#         let meta = getMetatable(o)
+#         if hasKey(meta,$MCALL):
+#             let fn = meta[$MCALL]
+#             result = some(fn(args))
     
 
 

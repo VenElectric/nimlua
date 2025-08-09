@@ -1,30 +1,31 @@
-import std/[lexbase]
+import std/[lexbase,tables,streams]
 from token import Token
+from lobject import MetaTable
+import llex,lparser
 
 type
-    LexState* = object of BaseLexer
-        lexeme*: string = ""
-        currentToken*: Token
-        tokens*: seq[Token] = @[]
-    ParseState* = object
-        currentToken*: Token
-        previousToken*: Token
-        cursor*: int = 0
-        tokens*: seq[Token]
     LuaState* = object
         parser*: ParseState
         lexer*: LexState
-        chunk: int
+        metatables*: Table[string,MetaTable]
 
 using
     L: var LuaState
 
-# proc `parser=`*(L;p:ParseState) {.inline.} = L.parser = p
-# func parser*(L): ParseState = L.parser
-
-# proc `lexer=`*(L;ls:var LexState) {.inline.} = L.lexer = ls
-# func lexer*(L): LexState = L.lexer
 func buf*(ls:var LexState): string = ls.buf
 func bufpos*(ls:var LexState): int = ls.bufpos
+
+proc newLuaState*(): LuaState = 
+    result.metatables = initTable[string,MetaTable]()
+
+
+proc initLexer*(L;buff: string) =
+    L.lexer = LexState()
+    L.lexer.open(newStringStream(buff))
+
+proc initParser*(L;tokens:seq[Token]) =
+    L.parser = ParseState(tokens: tokens)
+
+
 
 

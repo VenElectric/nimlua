@@ -1,12 +1,16 @@
 import token,last
 from last import newBinary
-from state import LuaState,ParseState
 import std/strformat
 
+type 
+    ParseState* = object
+        currentToken: Token
+        previousToken: Token
+        cursor: int = 0
+        tokens: seq[Token]
 
 
 using
-    L: var LuaState
     vp: var ParseState
 
 func check(vp; kindB: TokenKind): bool = vp.currentToken.kind == kindB
@@ -142,11 +146,7 @@ proc statlist(vp): Statement =
     while vp.currentToken.kind != TK_EOF:
         result.add(statement(vp))
 
-proc initParser(tokens:seq[Token]): ParseState =
-    result = ParseState(tokens: tokens)
-
-proc parse*(L): Statement =
-    L.parser = initParser(L.lexer.tokens)
-    result = statlist(L.parser)
+proc parse*(vp): Statement =
+    result = statlist(vp)
 
 
