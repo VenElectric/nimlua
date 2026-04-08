@@ -1,5 +1,5 @@
 import token,last
-from last import newBinary
+
 import std/strformat
 
 type 
@@ -147,6 +147,8 @@ proc statlist(vp): Statement =
         result.add(statement(vp))
 
 proc parse*(vp): Statement =
-    result = statlist(vp)
+    result = expression(vp)
+
+proc initParser*(tokens:seq[Token]): ParseState = ParseState(tokens: tokens)
 
 

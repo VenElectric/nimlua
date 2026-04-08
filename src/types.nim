@@ -76,4 +76,5 @@ type
        OPR_NOBINOPR 
 
 
-# proc `savedpc=`(c:CallInfo,value:int) = c.savedpc 
+type 
+    NaI* = distinct int64

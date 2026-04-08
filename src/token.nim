@@ -23,6 +23,7 @@ type
         TK_TRUE = "true"
         TK_UNTIL = "until"
         TK_WHILE = "while"
+        TK_TILDE = "~"
         TK_CONCAT = ".."
         TK_DOTS = "..."
         TK_EQ = "="

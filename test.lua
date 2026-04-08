@@ -1,7 +1,6 @@
-local y = setmetatable({},{ __call = function() return "hello callable" end})
+local x = 4.57e-3
+y = 5
 
-local t = setmetatable({}, {
-  __tostring = y
-})
-
-print(tostring(t))
+function myFun()
+    return true
+end

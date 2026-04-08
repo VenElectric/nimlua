@@ -1,2 +1,0 @@
-
-const MAX_RECURSION* = 200
