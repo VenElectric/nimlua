@@ -31,6 +31,7 @@ proc syntaxError(lineNum: int, msg: string) =
 
 
 proc getReserved(ls): TokenKind =
+    echo "lexeme: ",ls.lexeme
     case ls.lexeme:
         of "and":
             result = TK_AND
@@ -68,11 +69,13 @@ func peek(ls; pos: int = 0): char =
         return '\0'
     return ls.buf[ls.bufpos + pos]
 
-
-
 func lineNumber*(ls): int = ls.lineNumber
 
 proc skip(ls; steps: int = 1) = inc(ls.bufpos, steps)
+
+proc advance(ls): char = 
+    skip(ls)
+    result = peek(ls,-1)
 
 proc match(ls;ch:char): bool = 
     if peek(ls) == ch:
@@ -130,7 +133,6 @@ proc parseLongString(ls) =
         if peek(ls) in lexbase.Newlines:
             handleNewline(ls)
         else:
-
             skip(ls)
 
     if isEOF(ls):
@@ -160,6 +162,8 @@ proc parseString(ls) =
     # countries that don't use '.'
     # potentially get entire lexeme before doing checks on whether ',' or '.
 
+
+
 proc parseNumeral(ls) =
     var skipped = parseWhile(ls.buf, ls.lexeme, Digits + {'-', '+', '.', 'e'}, ls.bufpos)
     if skipped > 0:
@@ -178,13 +182,14 @@ proc parseVar(ls) =
 proc parseLiteral(ls): Token =
     var kind = TK_ERROR
 
-    case peek(ls):
+    case advance(ls):
         of ',': kind = TK_COMMA
         of '~':
-            if peek(ls, 1) == '=':
+            skip(ls)
+            if match(ls,'='):
                 kind = TK_NE
             else:
-                kind = TK_NOT
+                kind = TK_TILDE
         of '(': kind = TK_LEFTPAREN
         of ')': kind = TK_RIGHTPAREN
         of ']': kind = TK_LEFTSTAPLE
@@ -198,31 +203,36 @@ proc parseLiteral(ls): Token =
         of '*': kind = TK_STAR
         of '/': kind = TK_SLASH
         of ':':
-            if peek(ls, 1) == ':':
+            skip(ls)
+            if match(ls,':'):
                 kind = TK_DBCOLON
             else:
                 kind = TK_COLON
         of '-': kind = TK_MINUS
         of '=':
-            if peek(ls, 1) == '=':
+            skip(ls)
+            if match(ls,'='):
                 kind = TK_EQEQ
             else:
                 kind = TK_EQ
         of '>':
-            if peek(ls, 1) == '=':
+            skip(ls)
+            if match(ls,'='):
                 kind = TK_GE
             else:
                 kind = TK_GREATER
         of '<':
-            if peek(ls, 1) == '=':
+            skip(ls)
+            if match(ls,'='):
                 kind = TK_LE
             else:
-                skip(ls)
                 kind = TK_LESS
         of '[': kind = TK_RIGHTSTAPLE
         of '.':
-            if peek(ls, 1) == '.':
-                if peek(ls, 2) == '.':
+            skip(ls)
+            if match(ls,'.'):
+                skip(ls)
+                if match(ls,'.'):
                     kind = TK_DOTS
                 else:
                     kind = TK_CONCAT
@@ -230,14 +240,6 @@ proc parseLiteral(ls): Token =
                 kind = TK_DOT
         else:
             kind = TK_ERROR
-
-    # tk_le, tk_dots,tk_concat,tk_get,tk_eqeq,tk_dbcolon
-    if kind in {TK_LE, TK_DOTS, TK_CONCAT, TK_GE, TK_EQEQ, TK_DBCOLON, TK_NE}:
-        skip(ls, 2)
-    elif kind == TK_DOTS:
-        skip(ls, 3)
-    else:
-        skip(ls)
 
     if kind == TK_ERROR:
         syntaxError(ls.lineNumber, fmt"Invalid character {$peek(ls)}")
@@ -253,15 +255,9 @@ const LITERALS = {',', '(', ')', '{', '}', '+', '/', '*', ';', '#', '^',
 proc getToken(ls): Token =
     resetLexeme(ls)
 
-    if isEOf(ls):
-        return createEOFToken(ls.linenumber)
-
     let skipped = skipWhitespace(ls.buf, ls.bufpos)
     if skipped > 0:
         skip(ls, skipped)
-
-    if isEOF(ls):
-        result = createEOFToken(ls.linenumber)
 
     if peek(ls) in lexbase.Newlines:
         handleNewline(ls)
@@ -269,7 +265,11 @@ proc getToken(ls): Token =
 
 
     let ch = peek(ls)
+    echo "ch is: ",ch
     case ch:
+        of ' ':
+            skip(ls)
+            result = getToken(ls)
         of '"', '\'':
             parseString(ls)
             result = createToken(ls.linenumber, TK_STRING, ls.lexeme)
@@ -295,17 +295,10 @@ proc getToken(ls): Token =
         else:
             syntaxError(ls.linenumber, fmt"Invalid character: {ch}")
 
-
-
-proc next(ls) =
-    if isEOF(ls):
-        ls.tokens.add(createEOFToken(ls.linenumber))
-        close(ls)
-    else:
+proc lex*(ls) =
+    
+    while not isEOF(ls):
         ls.tokens.add(getToken(ls))
 
-proc lex*(ls) =
-    next(ls)
-    while ls.currentToken.kind != TK_EOF:
-        ls.tokens.add(ls.currentToken)
-        next(ls)
+    ls.tokens.add(createEOFToken(ls.linenumber))
+    close(ls)

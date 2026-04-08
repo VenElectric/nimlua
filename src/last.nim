@@ -1,11 +1,11 @@
-import std/[lists,options]
+import std/[lists,options,tables]
 import lobject,token
 
 type
     StmtKind* = enum 
         STBlock
         STExpression
-        # STCall
+        STCall
         # STLabel
         # STGoto
         # STDo
@@ -22,6 +22,7 @@ type
 
 
 type 
+    LuaState = ref object
     BinaryExpr = ref object
         left: Expression
         right: Expression
@@ -29,12 +30,17 @@ type
     UnaryExpr = ref object
         right: Expression
         op: Token
+    CallStmt = ref object
+        funcName*: string
+        args*: Table[string,LuaValue]
     Statement* = ref object
         case kind*:StmtKind
             of STBlock:
                 body: DoublyLinkedList[Statement]
             of STExpression:
                 expression: Expression
+            of STCall:
+                call: CallStmt
     Expression* = ref object
         case kind*: ExprKind
             of EKLiteral:
@@ -44,14 +50,14 @@ type
             of EKUnary:
                 unary: UnaryExpr
 
-proc evaluate(b:BinaryExpr): LuaValue
-proc evaluate(u:UnaryExpr): LuaValue
-proc evaluate(stm:Statement): Expression
-proc evaluate(exp:Expression):LuaValue
+proc evaluate*(b:BinaryExpr): LuaValue
+proc evaluate*(u:UnaryExpr): LuaValue
+proc evaluate*(stm:Statement)
+proc evaluate*(exp:Expression):LuaValue
+
 
 
 proc add*(parent:Statement,child:Statement) =
-    expect(parent.kind,STBlock)
     parent.body.add(child)
 
 proc newExpression(kind:ExprKind): Expression = 
@@ -61,23 +67,19 @@ proc newLiteralImpl(): Expression = result = newExpression(EKLiteral)
 
 proc newLiteral*(): Expression = 
     result = newLiteralImpl()
-    result.literal = newLNil()
 
 proc newLiteral*(value:int64): Expression = 
     result = newLiteralImpl()
-    result.literal = newLInteger(value)
+
 
 proc newLiteral*(value:float64): Expression = 
     result = newLiteralImpl()
-    result.literal = newLFloat(value)
 
 proc newLiteral*(value:string): Expression = 
     result = newLiteralImpl()
-    result.literal = newLString(value)
 
 proc newLiteral*(value:bool): Expression = 
     result = newLiteralImpl()
-    result.literal = newLBool(value)
 
 proc newBinary*(lhs,rhs:Expression,op:Token): Expression = 
     result = newExpression(EKBinary)
@@ -97,73 +99,71 @@ proc newExpressionStmt*(exp:Expression): Statement =
     result = newStatement(STExpression)
     result.expression = exp
 
+proc newCallStmt*(funcName:string,args:Table[string,LuaValue]): Statement =
+    result = newStatement(STCall)
+    result.call = CallStmt(funcName: funcName, args: args)
 
 proc evaluate(v:LuaValue): LuaValue = v
 
-template binop(op:untyped):untyped = 
-    let total = `op`(lhs,rhs)
-    if isSome(total):
-        result = get(total)
-    else:
-        result = newLNil()
 
 proc evaluate(b:BinaryExpr): LuaValue = 
     let lhs = evaluate(b.left)
     let rhs = evaluate(b.right)
     let op = b.op.kind
-    case op:
-        of TK_PLUS: 
-            binop(`+`)
-        of TK_MINUS: 
-            binop(`-`)
-        of TK_STAR:
-            binop(`*`)
-        of TK_SLASH:
-            binop(`/`)
-        of TK_DBSLASH:
-            binop(`//`)
-        of TK_AND,TK_BAND:
-            binop(`and`)
-        of TK_OR,TK_BOR:
-            binop(`or`)
-        of TK_CONCAT:
-            binop(`..`)
-        of TK_EQEQ:
-            binop(`==`)
-        of TK_LESS:
-            binop(`<`)
-        of TK_LE:
-            binop(`<=`)
-        of TK_GREATER:
-            binop(`>`)
-        of TK_GE:
-            binop(`>=`)
-        of TK_CARROT:
-            binop(`pow`)
-        of TK_MOD:
-            binop(`mod`)
-        of TK_NE:
-            binop(`~=`)
-        else: discard
-
-template unop(op:untyped):untyped =
-    let r = `op`(rhs)
-    if isSome(r):
-        result = get(r)
-    else:
-        result = newLNil()
+    result = LUANIL
+    # case op:
+    #     of TK_PLUS: 
+    #         result = lhs + rhs
+    #     of TK_MINUS: 
+    #         result = lhs - rhs
+    #     of TK_STAR:
+    #         result = lhs * rhs
+    #     of TK_SLASH:
+    #         result = lhs / rhs
+    #     of TK_DBSLASH:
+    #         result = lhs // rhs
+        # of TK_AND:
+        #     result = lhs and rhs
+        # of TK_BAND:
+        #     result = lhs & rhs
+        # of TK_OR:
+        #     result = lhs or rhs
+        # of TK_BOR:
+        #     result = lhs | rhs
+        # of TK_CONCAT:
+        #     result = lhs .. rhs
+        # of TK_EQEQ:
+        #     result = `==`(lhs,rhs)
+        # of TK_LESS:
+        #     result = lhs < rhs
+        # of TK_LE:
+        #     result = lhs <= rhs
+        # of TK_GREATER:
+        #     result = lhs > rhs
+        # of TK_GE:
+        #     result = lhs >= rhs
+        # of TK_CARROT:
+        #     result = lhs ^ rhs
+        # of TK_MOD:
+        #     result = lhs % rhs
+        # of TK_NE:
+        #     result = lhs ~= rhs
+        # else: discard
 
 proc evaluate(u:UnaryExpr): LuaValue =
     let rhs = evaluate(u.right)
     let op = u.op
-    case op.kind:
-        of TK_HASH: 
-            unop(`len`)
-        of TK_MINUS: 
-            unop(`-`)
-        of TK_NOT:
-            unop(`not`)
-        else: discard
+    result = LUANIL
+    # case op.kind:
+    #     of TK_HASH: 
+    #         result = len(rhs)
+    #     of TK_MINUS: 
+    #         result = `-`(rhs)
+    #     of TK_NOT:
+    #         result = not rhs
+    #     of TK_TILDE:
+    #         result = `~`(rhs)
+    #     else: discard
 
 proc evaluate(exp:Expression):LuaValue = 
     let kind = exp.kind
@@ -174,10 +174,11 @@ proc evaluate(exp:Expression):LuaValue =
 
 proc evaluate(body:DoublyLinkedList[Statement]) = 
     for b in items(body):
-        discard evaluate(b)
+        evaluate(b)
 
-proc evaluate(stm:Statement) =
+proc evaluate*(stm:Statement) =
     let kind = stm.kind
     case kind:
         of STBlock: evaluate(stm.body)
         of STExpression: discard evaluate(stm.expression)
+        of STCall: discard
