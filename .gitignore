@@ -4,3 +4,6 @@ nimlua
 nimlua.exe
 log.txt
 src/lua54/testfiles
+.agents
+.idea
+.zed
