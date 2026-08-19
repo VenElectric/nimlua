@@ -1,0 +1,67 @@
+nkBlock (3 statements)
+  stmt[0]:
+      nkFunctionDef(local=true, name=testUpvalue, arity=1)
+        params: [x]
+        body:
+          nkBlock (1 statements)
+            stmt[0]:
+                nkReturn(returnValue:
+                  nkFunctionDef(local=false, name=<anonymous>, arity=0)
+                    body:
+                      nkBlock (1 statements)
+                        stmt[0]:
+                            nkExprStmt
+                              expr:
+                                nkCall(
+                                  callee:
+                                    nkIdent(print)
+                                  args: [
+                                    arg[0]:
+                                      nkIdent(x)
+                                  ]
+                                )
+  stmt[1]:
+      nkLocalDecl(testFn)
+        value:
+          nkCall(
+            callee:
+              nkIdent(testUpvalue)
+            args: [
+              arg[0]:
+                nkNumber(20.0)
+            ]
+          )
+  stmt[2]:
+      nkExprStmt
+        expr:
+          nkCall(
+            callee:
+              nkIdent(testFn)
+            args: [
+            ]
+          )
+
+=== MAIN BLOCK BEGIN ===
+=== FUNCTION DEF TESTUPVALUE BEING ===
+local function testUpvalue
+*** PARAM : (x) ***
+=== TESTUPVALUE FUNCTION BODY BEGIN ===
+    *** RETURN START ***
+    return 
+    === CLOSURE FUNCTION START ===
+    function() 
+    *** CLOSURE BODY ***
+    print <-- IDENT/NKCALL
+    (x) <--- upvalue provided to print function (i.e. args)
+    *** CLOSURE BODY END ***
+    end
+    === CLOSURE FUNCTION END ===
+    *** RETURN END ***
+=== TESTUPVALUE FUNCTION BODY END ===
+end
+=== FUNCTION DEF TESTUPVALUE END ===
+
+local testFn = testUpvalue(20)
+
+testFn()
+=== MAIN BLOCK END ===

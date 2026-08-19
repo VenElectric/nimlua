@@ -1,0 +1,16 @@
+nkBlock (2 statements)
+  stmt[0]:
+      nkLocalDecl(x)
+        value:
+          nkNumber(10.0)
+  stmt[1]:
+      nkExprStmt
+        expr:
+          nkCall(
+            callee:
+              nkIdent(print)
+            args: [
+              arg[0]:
+                nkIdent(x)
+            ]
+          )
