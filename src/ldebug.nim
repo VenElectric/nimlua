@@ -1,5 +1,5 @@
 import std/logging
-import lvalue, lvm
+import lvalue, lvm,ltypes
 
 proc disassembleChunk*(chunk: Chunk, name: string = "Unknown") =
   debug "=== ", name, " ==="

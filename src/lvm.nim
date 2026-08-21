@@ -1,5 +1,6 @@
 import std/[tables, strutils, logging,math,bitops]
-import lparse, llex, lvalue, lerror,ltable,lcore
+import lparse, llex, lvalue, lerror,ltypes
+import modules/ltable
 
 type
   OpCode* = enum
@@ -47,46 +48,6 @@ type
     opSpreadVararg,
     opLoop,
     opAdjust
-
-type
-  Local = object
-    name: string
-    depth: int
-    isCaptured: bool
-  LoopContext = object
-    scopeDepth: int
-    breakJumps: seq[int]
-  PendingGoto = object
-    name: string
-    pc: int
-    scopeDepth: int
-    line: int
-  LabelSymbol = object
-    name: string
-    pc: int
-    scopeDepth: int
-  Compiler = ref object
-    enclosing*: Compiler
-    fn*: LuaClosure
-    locals: seq[Local]
-    scopeDepth: int
-    loops: seq[LoopContext]    # <--- Loop stack for break tracking
-    labels: seq[LabelSymbol]   # <--- Declared labels in current function
-    gotos: seq[PendingGoto]
-  CallFrame* = ref object
-    closure: LuaClosure 
-    ip: int           
-    slotBase: int
-    vararg: LuaValue
-  VM* = object
-    chunk*: Chunk
-    ip*: int                # Instruction Pointer
-    stack*: seq[LuaValue]   # The evaluation stack
-    globals*: Table[string, LuaValue]
-    frames*: seq[CallFrame] # NEW: The Call Stack!
-    traceExecution*: bool
-    openUpValues*: seq[LuaUpValue]
-    lastReturnCount*: int
 
 proc newLocal(name:string,depth:int,isCaptured:bool): Local = Local(name: name, depth: depth, isCaptured: isCaptured)
 
@@ -613,6 +574,9 @@ proc compile*(c: var Compiler, node: Node, chunk: var Chunk, line: int) =
     chunk.patchJump(exitJump)
     chunk.writeChunk(uint8(opPop), node.line)
     c.endScope(chunk, node.line)
+    let poppedLoop = c.loops.pop()
+    for breakJmp in poppedLoop.breakJumps:
+      chunk.patchJump(breakJmp)
   of nkLabel:
     for l in c.labels:
       if l.name == node.labelName and l.scopeDepth == c.scopeDepth:
@@ -655,19 +619,6 @@ proc compile*(c: var Compiler, node: Node, chunk: var Chunk, line: int) =
     else: # Forward jump
       let jumpOffset = chunk.emitJump(opJump, node.line)
       c.gotos.add(PendingGoto(name: node.labelName, pc: jumpOffset, scopeDepth: c.scopeDepth, line: node.line))
-  # of nkMultiGlobalDecl:
-  #   c.compile(node.value.callee, chunk, node.line)
-  #   for arg in node.value.args:
-  #     c.compile(arg, chunk, node.line)
-  #   chunk.writeChunk(uint8(opCall), node.line)
-  #   chunk.writeChunk(node.value.args.len.uint8, node.line)
-  #   chunk.writeChunk(uint8(opAdjust), node.line)
-  #   chunk.writeChunk(uint8(node.varNames.len), node.line)
-
-  #   for name in node.varNames:
-  #     let nameIdx = chunk.addConstant(newLuaString(name))
-  #     chunk.writeChunk(uint8(opSetGlobal), node.line)
-  #     chunk.writeChunk(nameIdx, node.line)
   of nkMultiLocalDecl, nkMultiGlobalDecl:
     let n = node.varNames.len
     let m = node.values.len
@@ -705,19 +656,111 @@ proc compile*(c: var Compiler, node: Node, chunk: var Chunk, line: int) =
             let nameIdx = chunk.addConstant(newLuaString(node.varNames[i]))
             chunk.writeChunk(uint8(opSetGlobal), node.line)
             chunk.writeChunk(nameIdx, node.line)
+  of nkGenericFor:
+    c.beginScope()
+
+    let n = 3   # generator, state, initial control
+    let m = node.iterExprs.len
+    for i, expr in node.iterExprs:
+      if i == m - 1 and expr.kind == nkCall:
+        let remaining = max(1, n - i)
+        c.compile(expr.callee, chunk, node.line)
+        for arg in expr.args: c.compile(arg, chunk, node.line)
+        chunk.writeChunk(uint8(opCall), node.line)
+        chunk.writeChunk(expr.args.len.uint8, node.line)
+        chunk.writeChunk(uint8(opAdjust), node.line)
+        chunk.writeChunk(uint8(remaining), node.line)
+      else:
+        c.compile(expr, chunk, node.line)
+    if m < n and (m == 0 or node.iterExprs[^1].kind != nkCall):
+      for i in m ..< n:
+        let nilIdx = chunk.addConstant(newLuaNil())
+        chunk.writeChunk(uint8(opConstant), node.line)
+        chunk.writeChunk(nilIdx, node.line)
+
+    # 1. Register the 3 hidden iterator variables
+    c.addLocal("(generator)")
+    c.locals[^1].depth = c.scopeDepth
+    let genSlot = c.locals.high
+
+    c.addLocal("(state)")
+    c.locals[^1].depth = c.scopeDepth
+    let stateSlot = c.locals.high
+
+    c.addLocal("(control)")
+    c.locals[^1].depth = c.scopeDepth
+    let controlSlot = c.locals.high
+
+    # 2. Register explicit loop variables (k, v) BEFORE loop entry and push placeholders
+    var varSlots = newSeq[int]()
+    for varName in node.loopVars:
+      c.addLocal(varName)
+      c.locals[^1].depth = c.scopeDepth
+      varSlots.add(c.locals.high)
+      let nilIdx = chunk.addConstant(newLuaNil())
+      chunk.writeChunk(uint8(opConstant), node.line)
+      chunk.writeChunk(nilIdx, node.line)
+
+    let loopStart = chunk.code.len
+    
+    # 3. Call generator: (generator)((state), (control))
+    chunk.writeChunk(uint8(opGetLocal), node.line); chunk.writeChunk(uint8(genSlot), node.line)
+    chunk.writeChunk(uint8(opGetLocal), node.line); chunk.writeChunk(uint8(stateSlot), node.line)
+    chunk.writeChunk(uint8(opGetLocal), node.line); chunk.writeChunk(uint8(controlSlot), node.line)
+    
+    chunk.writeChunk(uint8(opCall), node.line)
+    chunk.writeChunk(2'u8, node.line)
+    chunk.writeChunk(uint8(opAdjust), node.line)
+    chunk.writeChunk(uint8(node.loopVars.len), node.line)
+
+    # 4. Pop returned values from top of stack into varSlots in reverse order
+    for i in countdown(varSlots.high, 0):
+      chunk.writeChunk(uint8(opSetLocal), node.line)
+      chunk.writeChunk(uint8(varSlots[i]), node.line)
+
+    # 5. Loop exit check: stop if control var (first loop var) is nil
+    let firstVarSlot = varSlots[0]
+    chunk.writeChunk(uint8(opGetLocal), node.line); chunk.writeChunk(uint8(firstVarSlot), node.line)
+    
+    let nilIdx = chunk.addConstant(newLuaNil())
+    chunk.writeChunk(uint8(opConstant), node.line); chunk.writeChunk(nilIdx, node.line)
+    chunk.writeChunk(uint8(opNotEqual), node.line)
+    
+    let exitJump = chunk.emitJump(opJumpIfFalse, node.line)
+    chunk.writeChunk(uint8(opPop), node.line)
+
+    # 6. Update hidden control variable for next iteration
+    chunk.writeChunk(uint8(opGetLocal), node.line); chunk.writeChunk(uint8(firstVarSlot), node.line)
+    chunk.writeChunk(uint8(opSetLocal), node.line); chunk.writeChunk(uint8(controlSlot), node.line)
+
+    # 7. Execute loop body
+    c.addLoop()
+    c.beginScope()
+    c.compile(node.genericBody, chunk, node.line)
+    c.endScope(chunk, node.line)
+
+    chunk.emitLoop(loopStart, node.line)
+    chunk.patchJump(exitJump)
+    chunk.writeChunk(uint8(opPop), node.line)
+
+    let poppedLoop = c.loops.pop()
+    for breakJmp in poppedLoop.breakJumps:
+      chunk.patchJump(breakJmp)
+
+    c.endScope(chunk, node.line)
   else: raise newException(LuaCompileError,"Kind not handled: " & $node.kind)
 
 proc newVM*(): VM =
   # We pre-allocate a reasonable stack size to avoid constant memory reallocations
   VM(ip: 0, stack: newSeqOfCap[LuaValue](256))
 
-proc push(vm: var VM, value: LuaValue) =
+proc push*(vm: var VM, value: LuaValue) =
   vm.stack.add(value)
 
-proc pop(vm: var VM): LuaValue =
+proc pop*(vm: var VM): LuaValue =
   return vm.stack.pop()
 
-proc peek(vm: VM, distance: int): LuaValue = vm.stack[vm.stack.len - 1 - distance]
+proc peek*(vm: VM, distance: int): LuaValue = vm.stack[vm.stack.len - 1 - distance]
 
 proc chunk(cf: CallFrame): Chunk = cf.closure.fn.chunk
   # We define a helper macro or proc to read a byte and advance the IP
@@ -827,9 +870,9 @@ proc concat(vm:var VM) =
   else:
     raise newException(LuaRuntimeError,"Cannot concat: " & $l.kind & " and " & $r.kind)
 
-proc run*(vm: var VM): int =
+proc run*(vm: var VM,stopDepth:int = 0): int =
   # The giant loop
-  while vm.frames.len > 0:
+  while vm.frames.len > stopDepth:
     
     var frame = vm.frames[^1]
     let instruction = OpCode(vm.readByte())
@@ -1001,16 +1044,18 @@ proc run*(vm: var VM): int =
 
       elif callee.kind == ltNativeFn:
         var args = newSeq[LuaValue](argCount)
-        for i in countdown(argCount - 1, 0):
-          args[i] = vm.pop()
-
-        discard vm.pop() # Pop the native function object
-        # discard vm.pop()
-
-        # 3. OUTSIDE THE LOOP: Execute the native function
-        let res = callee.nativeFn(args)
-        vm.push(res)
-        vm.lastReturnCount = 1
+        for i in countdown(argCount - 1, 0): args[i] = vm.pop()
+        discard vm.pop()
+        let results = callee.nativeFn(args)
+        for r in results: vm.push(r)
+        vm.lastReturnCount = results.len
+      elif callee.kind == ltNativeFnVM:
+        var args = newSeq[LuaValue](argCount)
+        for i in countdown(argCount - 1, 0): args[i] = vm.pop()
+        discard vm.pop()
+        let results = callee.nativeFnVM(vm, args)
+        for r in results: vm.push(r)
+        vm.lastReturnCount = results.len
 
       else:
         raise newException(LuaRuntimeError, "Attempt to call a non-function value!")
@@ -1025,7 +1070,7 @@ proc run*(vm: var VM): int =
       vm.lastReturnCount = n
       vm.stack.setLen(frame.slotBase)
       for r in results: vm.stack.add(r)
-      if vm.frames.len == 0:
+      if vm.frames.len == stopDepth:
         return 0
     of opJumpIfFalse:
       let offset = vm.readShort()
@@ -1109,27 +1154,3 @@ proc run*(vm: var VM): int =
         for i in 0 ..< (want - have):
           vm.push(newLuaNil())
           
-proc interpret*(vm: var VM, chunk: var Chunk) =
-  # 1. Clear state for a fresh execution (if re-using VM across runs)
-  vm.stack = @[]
-  vm.frames = @[]
-  vm.globals["table"] = newTabLib()
-  vm.globals["print"] = newNimFn(luaPrint)
-  vm.globals["setmetatable"] = newNimFn(luaSetMetatable)
-  vm.globals["getmetatable"] = newNimFn(luaGetMetatable)
-  vm.globals["pairs"] = newNimFn(luaPairs)
-  vm.globals["ipairs"] = newNimFn(luaIPairs)
-  # 2. Wrap the top-level chunk in a main script function
-
-  let mainVal = newLuaClosure("<main>", 0, chunk)
-  vm.stack.add(wrapLuaClosure(mainVal))
-  # 4. Bootstrap the FIRST CallFrame!
-  let rootFrame = CallFrame(
-    closure: mainVal,
-    ip: 0,
-    slotBase: 0 # Top-level variables and locals live relative to slot 0
-  )
-  vm.frames.add(rootFrame)
-
-  # 5. Now run() can safely execute vm.frames[^1] without out-of-bounds errors!
-  discard vm.run()

@@ -1,4 +1,5 @@
 import llex, lerror
+from ltypes import ValueAttribute
 import std/[strutils,logging]
 type
   NodeKind* = enum
@@ -29,6 +30,7 @@ type
     nkIndexSet,
     nkVararg,
     nkNumericFor,
+    nkGenericFor,
     nkBreak,
     nkGoto,
     nkLabel
@@ -90,6 +92,10 @@ type
       forStop*: Node
       forStep*: Node    # nil if the third `, step` was omitted
       forBody*: Node
+    of nkGenericFor:
+      loopVars*: seq[string] # E.g., @["k", "v"]
+      iterExprs*: seq[Node]  # E.g., the AST for `pairs(t)`
+      genericBody*: Node     # The block inside the loop
     of nkMultiLocalDecl, nkMultiGlobalDecl:
       varNames*: seq[string]
       values*: seq[Node]
@@ -217,6 +223,9 @@ proc newMultiGlobalDecl(names:seq[string],values:seq[Node],line:int): Node =
   result.varNames = names
   result.values = values
 
+proc newGenericFor(vars: seq[string], exprs: seq[Node], body: Node, line: int): Node =
+  Node(kind: nkGenericFor, loopVars: vars, iterExprs: exprs, genericBody: body, line: line)
+
 using
   p: LuaParser
   vp: var LuaParser
@@ -338,24 +347,56 @@ proc parseWhileStmt(vp): Node =
 proc parseForStmt(vp): Node =
   let line = vp.peek().line
   vp.consume(tkFor, "Expect 'for'")
+  
   if not vp.match(tkIdent):
     raise newException(LuaSyntaxError, "Expected loop variable name after 'for'.")
-  let firstName = vp.previous().lexeme
+  
+  # 1. Collect all loop variable names (could be one, could be many)
+  var loopVars: seq[string] = @[vp.previous().lexeme]
+  
+  while vp.match(tkComma):
+    if not vp.match(tkIdent):
+      raise newException(LuaSyntaxError, "Expected variable name after ','.")
+    loopVars.add(vp.previous().lexeme)
 
+  # 2. Branch: Numeric vs Generic
   if vp.match(tkAssign):
+    # Numeric Loop: for i = 1, 10 do
+    if loopVars.len > 1:
+      raise newException(LuaSyntaxError, "Numeric for loops can only have one loop variable.")
+      
     let startExpr = vp.parseExpression()
     vp.consume(tkComma, "Expected ',' after for-loop start value.")
     let stopExpr = vp.parseExpression()
-    var stepExpr: Node = nil
+    
+    var stepExpr: Node
     if vp.match(tkComma):
       stepExpr = vp.parseExpression()
+      
     vp.consume(tkDo, "Expected 'do' after for-loop header.")
     let body = vp.parseBlockUntil(tkEnd)
     vp.consume(tkEnd, "Expected 'end' to close for loop.")
-    return newNumericFor(firstName, startExpr, stopExpr, stepExpr, body, line)
+    
+    return newNumericFor(loopVars[0], startExpr, stopExpr, stepExpr, body, line)
+
+  elif vp.match(tkIn):
+    # Generic Loop: for k, v in pairs(t) do
+    var iterExprs: seq[Node] = @[]
+    iterExprs.add(vp.parseExpression())
+    
+    # In Lua, you can actually return multiple iterators: for a in f1(), f2() do
+    while vp.match(tkComma):
+      iterExprs.add(vp.parseExpression())
+      
+    vp.consume(tkDo, "Expected 'do' after generic for-loop header.")
+    let body = vp.parseBlockUntil(tkEnd)
+    vp.consume(tkEnd, "Expected 'end' to close for loop.")
+    
+    return newGenericFor(loopVars, iterExprs, body, line)
+
   else:
-    discard
-# local a,b,c = 1,2,3
+    raise newException(LuaSyntaxError, "Expected '=' or 'in' after for loop variables.")
+
 proc parseVarDecl(vp): Node =
   # 1. Determine which keyword we just matched
   discard vp.advance()
@@ -739,7 +780,14 @@ proc printNode*(node: Node, indent: string = "") =
     printNode(node.setKey)
     echo "value: "
     printNode(node.setValue)
-  
+  of nkGenericFor:
+    echo prefix & "nkGenericFor"
+    echo prefix & "  loopVars: [" & node.loopVars.join(", ") & "]"
+    echo prefix & "  iterExprs:"
+    for i, expr in node.iterExprs:
+      printNode(expr, indent & "    ")
+    echo prefix & "  body:"
+    printNode(node.genericBody, indent & "    ")
   else:
     echo prefix & "unknown kind: " & $node.kind
 

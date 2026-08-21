@@ -18,7 +18,7 @@ type
 
     # Keywords
     tkLocal, tkFunction, tkIf, tkElseIf,tkElse,tkThen, tkEnd, tkReturn, tkGlobal,
-    tkWhile,tkRepeat,tkFor,tkDo,tkBreak,tkAnd,tkNot,tkOr,tkGoto
+    tkWhile,tkRepeat,tkFor,tkDo,tkBreak,tkAnd,tkNot,tkOr,tkGoto,tkIn
 
     # Special
     tkEOF, tkError
@@ -64,7 +64,8 @@ const keywords = {
   "not": tkNot,
   "and": tkAnd,
   "or": tkOr,
-  "goto": tkGoto
+  "goto": tkGoto,
+  "in": tkIn
 }.toTable
 
 using

@@ -1,6 +1,6 @@
 from strutils import join
 import std/[tables,sugar,sequtils]
-import lvalue,lerror
+import ../lvalue,../lerror,../ltypes
 
 proc allKeysNumbers(v:LuaTable): bool = 
   let s = collect(newSeq):
@@ -24,7 +24,7 @@ proc luaToStr(v: LuaValue): string =
   of ltNumber: $v.nval
   else: raise newException(LuaRuntimeError, "invalid value (" & $v.kind & ") in table for 'concat'")
 
-proc tableConcat(args: varargs[LuaValue]): LuaValue =
+proc tableConcat(args: varargs[LuaValue]): seq[LuaValue] =
   if len(args) < 1 or not isTable(args[0]):
     raise newException(LuaRuntimeError, "Cannot use concat on a non-table value.")
   let tab = args[0]
@@ -47,9 +47,9 @@ proc tableConcat(args: varargs[LuaValue]): LuaValue =
       raise newException(LuaRuntimeError, "invalid value (nil) at index " & $i & " in table for 'concat'")
     items.add(luaToStr(tab.tval[key]))
 
-  return newLuaString(items.join(sep))
+  return @[newLuaString(items.join(sep))]
 
-proc tableInsert(args: varargs[LuaValue]): LuaValue =
+proc tableInsert(args: varargs[LuaValue]): seq[LuaValue] =
   if len(args) < 2 or not isTable(args[0]):
     raise newException(LuaRuntimeError, "Can not use insert on a non-table value")
   let tab = args[0]
@@ -67,15 +67,16 @@ proc tableInsert(args: varargs[LuaValue]): LuaValue =
   else:
     raise newException(LuaRuntimeError, "Wrong number of arguments to insert")
 
-  return newLuaNil()
+  return @[newLuaNil()]
 
 proc tableMove(args:varargs[LuaValue]): LuaValue = discard
 
-proc tablePack(args:varargs[LuaValue]): LuaValue =
-  result = newLuaTable()
+proc tablePack(args:varargs[LuaValue]): seq[LuaValue] =
+  var tab = newLuaTable()
   for i, v in args:
-    result.tval[newLuaNumber(float64(i + 1))] = v
-  result.tval[newLuaString("n")] = newLuaNumber(float64(args.len))
+    tab.tval[newLuaNumber(float64(i + 1))] = v
+  tab.tval[newLuaString("n")] = newLuaNumber(float64(args.len))
+  return @[tab]
 
 proc tableRemove(args:varargs[LuaValue]): LuaValue = discard
 
@@ -127,4 +128,5 @@ proc luaIndexSet*(tblVal, key, val: LuaValue) =
       else:
         raise newException(LuaRuntimeError, "__newindex must be a table or function")
 
-  tblVal.tval[key] = val
+  if not isLuaNil(val):
+    tblVal.tval[key] = val

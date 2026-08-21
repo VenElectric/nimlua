@@ -1,0 +1,1 @@
+return function(x) print(x) end

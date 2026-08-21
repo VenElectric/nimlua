@@ -1,4 +1,4 @@
-import lvm, lvalue, lparse, llex, lerror, log,ldebug
+import lvm, lvalue, lparse, llex, lerror, log,ldebug,ltypes,lauxlib
 import std/[tables, logging, parseopt]
 
 initLogging(lvlAll)

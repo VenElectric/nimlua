@@ -3475,3 +3475,1474 @@
 [DEBUG] 2026-08-19T16:14:51: Isvararg before fn def: false
 [INFO] 2026-08-19T16:14:51: Node name: MyTest
 [INFO] 2026-08-19T16:14:51: Node vararg: false
+[FATAL] 2026-08-19T21:30:43: Runtime Error: Attempt to call a non-function value!
+[DEBUG] 2026-08-19T21:30:51: Kind: ltClosure
+[DEBUG] 2026-08-19T21:30:51: IP:    1 | OP:   opNewTable | Stack: [function: <main>]
+[DEBUG] 2026-08-19T21:30:51: Kind: ltClosure
+[DEBUG] 2026-08-19T21:30:51: Kind: ltTable
+[DEBUG] 2026-08-19T21:30:51: IP:    2 | OP:   opConstant | Stack: [function: <main>, table: 0x4300113536]
+[DEBUG] 2026-08-19T21:30:51: Kind: ltClosure
+[DEBUG] 2026-08-19T21:30:51: Kind: ltTable
+[DEBUG] 2026-08-19T21:30:51: Kind: ltNumber
+[DEBUG] 2026-08-19T21:30:51: IP:    4 | OP:   opConstant | Stack: [function: <main>, table: 0x4300113536, 1.0]
+[DEBUG] 2026-08-19T21:30:51: Kind: ltClosure
+[DEBUG] 2026-08-19T21:30:51: Kind: ltTable
+[DEBUG] 2026-08-19T21:30:51: Kind: ltNumber
+[DEBUG] 2026-08-19T21:30:51: Kind: ltNumber
+[DEBUG] 2026-08-19T21:30:51: IP:    6 | OP:   opSetTable | Stack: [function: <main>, table: 0x4300113536, 1.0, 1.0]
+[DEBUG] 2026-08-19T21:30:51: Kind: ltClosure
+[DEBUG] 2026-08-19T21:30:51: Kind: ltTable
+[DEBUG] 2026-08-19T21:30:51: IP:    7 | OP:   opConstant | Stack: [function: <main>, table: 0x4300113536]
+[DEBUG] 2026-08-19T21:30:51: Kind: ltClosure
+[DEBUG] 2026-08-19T21:30:51: Kind: ltTable
+[DEBUG] 2026-08-19T21:30:51: Kind: ltNumber
+[DEBUG] 2026-08-19T21:30:51: IP:    9 | OP:   opConstant | Stack: [function: <main>, table: 0x4300113536, 2.0]
+[DEBUG] 2026-08-19T21:30:51: Kind: ltClosure
+[DEBUG] 2026-08-19T21:30:51: Kind: ltTable
+[DEBUG] 2026-08-19T21:30:51: Kind: ltNumber
+[DEBUG] 2026-08-19T21:30:51: Kind: ltNumber
+[DEBUG] 2026-08-19T21:30:51: IP:   11 | OP:   opSetTable | Stack: [function: <main>, table: 0x4300113536, 2.0, 2.0]
+[DEBUG] 2026-08-19T21:30:51: Kind: ltClosure
+[DEBUG] 2026-08-19T21:30:51: Kind: ltTable
+[DEBUG] 2026-08-19T21:30:51: IP:   12 | OP:   opConstant | Stack: [function: <main>, table: 0x4300113536]
+[DEBUG] 2026-08-19T21:30:51: Kind: ltClosure
+[DEBUG] 2026-08-19T21:30:51: Kind: ltTable
+[DEBUG] 2026-08-19T21:30:51: Kind: ltNumber
+[DEBUG] 2026-08-19T21:30:51: IP:   14 | OP:   opConstant | Stack: [function: <main>, table: 0x4300113536, 3.0]
+[DEBUG] 2026-08-19T21:30:51: Kind: ltClosure
+[DEBUG] 2026-08-19T21:30:51: Kind: ltTable
+[DEBUG] 2026-08-19T21:30:51: Kind: ltNumber
+[DEBUG] 2026-08-19T21:30:51: Kind: ltNumber
+[DEBUG] 2026-08-19T21:30:51: IP:   16 | OP:   opSetTable | Stack: [function: <main>, table: 0x4300113536, 3.0, 3.0]
+[DEBUG] 2026-08-19T21:30:51: Kind: ltClosure
+[DEBUG] 2026-08-19T21:30:51: Kind: ltTable
+[DEBUG] 2026-08-19T21:30:51: IP:   17 | OP:   opSetLocal | Stack: [function: <main>, table: 0x4300113536]
+[DEBUG] 2026-08-19T21:30:51: Kind: ltClosure
+[DEBUG] 2026-08-19T21:30:51: Kind: ltTable
+[DEBUG] 2026-08-19T21:30:51: IP:   19 | OP:  opGetGlobal | Stack: [function: <main>, table: 0x4300113536]
+[DEBUG] 2026-08-19T21:30:51: Kind: ltClosure
+[DEBUG] 2026-08-19T21:30:51: Kind: ltTable
+[DEBUG] 2026-08-19T21:30:51: Kind: ltNativeFn
+[DEBUG] 2026-08-19T21:30:51: IP:   21 | OP:   opGetLocal | Stack: [function: <main>, table: 0x4300113536, function: 0x4300113056]
+[DEBUG] 2026-08-19T21:30:51: Kind: ltClosure
+[DEBUG] 2026-08-19T21:30:51: Kind: ltTable
+[DEBUG] 2026-08-19T21:30:51: Kind: ltNativeFn
+[DEBUG] 2026-08-19T21:30:51: Kind: ltTable
+[DEBUG] 2026-08-19T21:30:51: IP:   23 | OP:       opCall | Stack: [function: <main>, table: 0x4300113536, function: 0x4300113056, table: 0x4300113536]
+[DEBUG] 2026-08-19T21:30:51: Kind: ltClosure
+[DEBUG] 2026-08-19T21:30:51: Kind: ltTable
+[DEBUG] 2026-08-19T21:30:51: Kind: ltNativeFn
+[DEBUG] 2026-08-19T21:30:51: Kind: ltTable
+[DEBUG] 2026-08-19T21:30:51: Kind: ltNil
+[DEBUG] 2026-08-19T21:30:51: IP:   25 | OP:     opAdjust | Stack: [function: <main>, table: 0x4300113536, function: 0x4300113680, table: 0x4300113536, nil]
+[DEBUG] 2026-08-19T21:30:51: Kind: ltClosure
+[DEBUG] 2026-08-19T21:30:51: Kind: ltTable
+[DEBUG] 2026-08-19T21:30:51: Kind: ltNativeFn
+[DEBUG] 2026-08-19T21:30:51: Kind: ltTable
+[DEBUG] 2026-08-19T21:30:51: Kind: ltNil
+[DEBUG] 2026-08-19T21:30:51: IP:   27 | OP:   opSetLocal | Stack: [function: <main>, table: 0x4300113536, function: 0x4300113680, table: 0x4300113536, nil]
+[DEBUG] 2026-08-19T21:30:51: Kind: ltClosure
+[DEBUG] 2026-08-19T21:30:51: Kind: ltTable
+[DEBUG] 2026-08-19T21:30:51: Kind: ltNil
+[DEBUG] 2026-08-19T21:30:51: Kind: ltTable
+[DEBUG] 2026-08-19T21:30:51: IP:   29 | OP:   opSetLocal | Stack: [function: <main>, table: 0x4300113536, nil, table: 0x4300113536]
+[DEBUG] 2026-08-19T21:30:51: Kind: ltClosure
+[DEBUG] 2026-08-19T21:30:51: Kind: ltTable
+[DEBUG] 2026-08-19T21:30:51: Kind: ltNil
+[DEBUG] 2026-08-19T21:30:51: Kind: ltTable
+[DEBUG] 2026-08-19T21:30:51: IP:   31 | OP:   opSetLocal | Stack: [function: <main>, table: 0x4300113536, nil, table: 0x4300113536]
+[DEBUG] 2026-08-19T21:30:51: Kind: ltClosure
+[DEBUG] 2026-08-19T21:30:51: Kind: ltTable
+[DEBUG] 2026-08-19T21:30:51: Kind: ltNil
+[DEBUG] 2026-08-19T21:30:51: Kind: ltTable
+[DEBUG] 2026-08-19T21:30:51: IP:   33 | OP:   opGetLocal | Stack: [function: <main>, table: 0x4300113536, nil, table: 0x4300113536]
+[DEBUG] 2026-08-19T21:30:51: Kind: ltClosure
+[DEBUG] 2026-08-19T21:30:51: Kind: ltTable
+[DEBUG] 2026-08-19T21:30:51: Kind: ltNil
+[DEBUG] 2026-08-19T21:30:51: Kind: ltTable
+[DEBUG] 2026-08-19T21:30:51: Kind: ltNil
+[DEBUG] 2026-08-19T21:30:51: IP:   35 | OP:   opGetLocal | Stack: [function: <main>, table: 0x4300113536, nil, table: 0x4300113536, nil]
+[DEBUG] 2026-08-19T21:30:51: Kind: ltClosure
+[DEBUG] 2026-08-19T21:30:51: Kind: ltTable
+[DEBUG] 2026-08-19T21:30:51: Kind: ltNil
+[DEBUG] 2026-08-19T21:30:51: Kind: ltTable
+[DEBUG] 2026-08-19T21:30:51: Kind: ltNil
+[DEBUG] 2026-08-19T21:30:51: Kind: ltTable
+[DEBUG] 2026-08-19T21:30:51: IP:   37 | OP:   opGetLocal | Stack: [function: <main>, table: 0x4300113536, nil, table: 0x4300113536, nil, table: 0x4300113536]
+[DEBUG] 2026-08-19T21:30:51: Kind: ltClosure
+[DEBUG] 2026-08-19T21:30:51: Kind: ltTable
+[DEBUG] 2026-08-19T21:30:51: Kind: ltNil
+[DEBUG] 2026-08-19T21:30:51: Kind: ltTable
+[DEBUG] 2026-08-19T21:30:51: Kind: ltNil
+[DEBUG] 2026-08-19T21:30:51: Kind: ltTable
+[DEBUG] 2026-08-19T21:30:51: Kind: ltNil
+[DEBUG] 2026-08-19T21:30:51: IP:   39 | OP:       opCall | Stack: [function: <main>, table: 0x4300113536, nil, table: 0x4300113536, nil, table: 0x4300113536, nil]
+[FATAL] 2026-08-19T21:30:51: Runtime Error: Attempt to call a non-function value!
+[DEBUG] 2026-08-19T21:36:49: Kind: ltClosure
+[DEBUG] 2026-08-19T21:36:49: IP:    1 | OP:   opNewTable | Stack: [function: <main>]
+[DEBUG] 2026-08-19T21:36:49: Kind: ltClosure
+[DEBUG] 2026-08-19T21:36:49: Kind: ltTable
+[DEBUG] 2026-08-19T21:36:49: IP:    2 | OP:   opConstant | Stack: [function: <main>, table: 0x4311533184]
+[DEBUG] 2026-08-19T21:36:49: Kind: ltClosure
+[DEBUG] 2026-08-19T21:36:49: Kind: ltTable
+[DEBUG] 2026-08-19T21:36:49: Kind: ltNumber
+[DEBUG] 2026-08-19T21:36:49: IP:    4 | OP:   opConstant | Stack: [function: <main>, table: 0x4311533184, 1.0]
+[DEBUG] 2026-08-19T21:36:49: Kind: ltClosure
+[DEBUG] 2026-08-19T21:36:49: Kind: ltTable
+[DEBUG] 2026-08-19T21:36:49: Kind: ltNumber
+[DEBUG] 2026-08-19T21:36:49: Kind: ltNumber
+[DEBUG] 2026-08-19T21:36:49: IP:    6 | OP:   opSetTable | Stack: [function: <main>, table: 0x4311533184, 1.0, 1.0]
+[DEBUG] 2026-08-19T21:36:49: Kind: ltClosure
+[DEBUG] 2026-08-19T21:36:49: Kind: ltTable
+[DEBUG] 2026-08-19T21:36:49: IP:    7 | OP:   opConstant | Stack: [function: <main>, table: 0x4311533184]
+[DEBUG] 2026-08-19T21:36:49: Kind: ltClosure
+[DEBUG] 2026-08-19T21:36:49: Kind: ltTable
+[DEBUG] 2026-08-19T21:36:49: Kind: ltNumber
+[DEBUG] 2026-08-19T21:36:49: IP:    9 | OP:   opConstant | Stack: [function: <main>, table: 0x4311533184, 2.0]
+[DEBUG] 2026-08-19T21:36:49: Kind: ltClosure
+[DEBUG] 2026-08-19T21:36:49: Kind: ltTable
+[DEBUG] 2026-08-19T21:36:49: Kind: ltNumber
+[DEBUG] 2026-08-19T21:36:49: Kind: ltNumber
+[DEBUG] 2026-08-19T21:36:49: IP:   11 | OP:   opSetTable | Stack: [function: <main>, table: 0x4311533184, 2.0, 2.0]
+[DEBUG] 2026-08-19T21:36:49: Kind: ltClosure
+[DEBUG] 2026-08-19T21:36:49: Kind: ltTable
+[DEBUG] 2026-08-19T21:36:49: IP:   12 | OP:   opConstant | Stack: [function: <main>, table: 0x4311533184]
+[DEBUG] 2026-08-19T21:36:49: Kind: ltClosure
+[DEBUG] 2026-08-19T21:36:49: Kind: ltTable
+[DEBUG] 2026-08-19T21:36:49: Kind: ltNumber
+[DEBUG] 2026-08-19T21:36:49: IP:   14 | OP:   opConstant | Stack: [function: <main>, table: 0x4311533184, 3.0]
+[DEBUG] 2026-08-19T21:36:49: Kind: ltClosure
+[DEBUG] 2026-08-19T21:36:49: Kind: ltTable
+[DEBUG] 2026-08-19T21:36:49: Kind: ltNumber
+[DEBUG] 2026-08-19T21:36:49: Kind: ltNumber
+[DEBUG] 2026-08-19T21:36:49: IP:   16 | OP:   opSetTable | Stack: [function: <main>, table: 0x4311533184, 3.0, 3.0]
+[DEBUG] 2026-08-19T21:36:49: Kind: ltClosure
+[DEBUG] 2026-08-19T21:36:49: Kind: ltTable
+[DEBUG] 2026-08-19T21:36:49: IP:   17 | OP:   opSetLocal | Stack: [function: <main>, table: 0x4311533184]
+[DEBUG] 2026-08-19T21:36:49: Kind: ltClosure
+[DEBUG] 2026-08-19T21:36:49: Kind: ltTable
+[DEBUG] 2026-08-19T21:36:49: IP:   19 | OP:  opGetGlobal | Stack: [function: <main>, table: 0x4311533184]
+[DEBUG] 2026-08-19T21:36:49: Kind: ltClosure
+[DEBUG] 2026-08-19T21:36:49: Kind: ltTable
+[DEBUG] 2026-08-19T21:36:49: Kind: ltNativeFn
+[DEBUG] 2026-08-19T21:36:49: IP:   21 | OP:   opGetLocal | Stack: [function: <main>, table: 0x4311533184, function: 0x4311532704]
+[DEBUG] 2026-08-19T21:36:49: Kind: ltClosure
+[DEBUG] 2026-08-19T21:36:49: Kind: ltTable
+[DEBUG] 2026-08-19T21:36:49: Kind: ltNativeFn
+[DEBUG] 2026-08-19T21:36:49: Kind: ltTable
+[DEBUG] 2026-08-19T21:36:49: IP:   23 | OP:       opCall | Stack: [function: <main>, table: 0x4311533184, function: 0x4311532704, table: 0x4311533184]
+[DEBUG] 2026-08-19T21:36:49: Kind: ltClosure
+[DEBUG] 2026-08-19T21:36:49: Kind: ltTable
+[DEBUG] 2026-08-19T21:36:49: Kind: ltNativeFn
+[DEBUG] 2026-08-19T21:36:49: Kind: ltTable
+[DEBUG] 2026-08-19T21:36:49: Kind: ltNil
+[DEBUG] 2026-08-19T21:36:49: IP:   25 | OP:     opAdjust | Stack: [function: <main>, table: 0x4311533184, function: 0x4311533328, table: 0x4311533184, nil]
+[DEBUG] 2026-08-19T21:36:49: Kind: ltClosure
+[DEBUG] 2026-08-19T21:36:49: Kind: ltTable
+[DEBUG] 2026-08-19T21:36:49: Kind: ltNativeFn
+[DEBUG] 2026-08-19T21:36:49: Kind: ltTable
+[DEBUG] 2026-08-19T21:36:49: Kind: ltNil
+[DEBUG] 2026-08-19T21:36:49: IP:   27 | OP:   opSetLocal | Stack: [function: <main>, table: 0x4311533184, function: 0x4311533328, table: 0x4311533184, nil]
+[DEBUG] 2026-08-19T21:36:49: Kind: ltClosure
+[DEBUG] 2026-08-19T21:36:49: Kind: ltTable
+[DEBUG] 2026-08-19T21:36:49: Kind: ltNativeFn
+[DEBUG] 2026-08-19T21:36:49: Kind: ltTable
+[DEBUG] 2026-08-19T21:36:49: Kind: ltNil
+[DEBUG] 2026-08-19T21:36:49: IP:   29 | OP:   opSetLocal | Stack: [function: <main>, table: 0x4311533184, function: 0x4311533328, table: 0x4311533184, nil]
+[DEBUG] 2026-08-19T21:36:49: Kind: ltClosure
+[DEBUG] 2026-08-19T21:36:49: Kind: ltTable
+[DEBUG] 2026-08-19T21:36:49: Kind: ltNativeFn
+[DEBUG] 2026-08-19T21:36:49: Kind: ltNil
+[DEBUG] 2026-08-19T21:36:49: IP:   31 | OP:   opSetLocal | Stack: [function: <main>, table: 0x4311533184, function: 0x4311533328, nil]
+[DEBUG] 2026-08-19T21:36:49: Kind: ltClosure
+[DEBUG] 2026-08-19T21:36:49: Kind: ltTable
+[DEBUG] 2026-08-19T21:36:49: Kind: ltNil
+[DEBUG] 2026-08-19T21:36:49: IP:   33 | OP:   opGetLocal | Stack: [function: <main>, table: 0x4311533184, nil]
+[DEBUG] 2026-08-19T21:36:49: Kind: ltClosure
+[DEBUG] 2026-08-19T21:36:49: Kind: ltTable
+[DEBUG] 2026-08-19T21:36:49: Kind: ltNil
+[DEBUG] 2026-08-19T21:36:49: Kind: ltNil
+[DEBUG] 2026-08-19T21:36:49: IP:   35 | OP:   opGetLocal | Stack: [function: <main>, table: 0x4311533184, nil, nil]
+[DEBUG] 2026-08-19T21:36:49: Kind: ltClosure
+[DEBUG] 2026-08-19T21:36:49: Kind: ltTable
+[DEBUG] 2026-08-19T21:36:49: Kind: ltNil
+[DEBUG] 2026-08-19T21:36:49: Kind: ltNil
+[DEBUG] 2026-08-19T21:36:49: Kind: ltNil
+[DEBUG] 2026-08-19T21:36:49: IP:   37 | OP:   opGetLocal | Stack: [function: <main>, table: 0x4311533184, nil, nil, nil]
+[DEBUG] 2026-08-19T21:36:49: Kind: ltClosure
+[DEBUG] 2026-08-19T21:36:49: Kind: ltTable
+[DEBUG] 2026-08-19T21:36:49: Kind: ltNil
+[DEBUG] 2026-08-19T21:36:49: Kind: ltNil
+[DEBUG] 2026-08-19T21:36:49: Kind: ltNil
+[DEBUG] 2026-08-19T21:36:49: Kind: ltNil
+[DEBUG] 2026-08-19T21:36:49: IP:   39 | OP:       opCall | Stack: [function: <main>, table: 0x4311533184, nil, nil, nil, nil]
+[FATAL] 2026-08-19T21:36:49: Runtime Error: Attempt to call a non-function value!
+[DEBUG] 2026-08-20T07:55:43: Kind: ltClosure
+[DEBUG] 2026-08-20T07:55:43: IP:    1 | OP:   opNewTable | Stack: [function: <main>]
+[DEBUG] 2026-08-20T07:55:43: Kind: ltClosure
+[DEBUG] 2026-08-20T07:55:43: Kind: ltTable
+[DEBUG] 2026-08-20T07:55:43: IP:    2 | OP:   opConstant | Stack: [function: <main>, table: 0x4305995392]
+[DEBUG] 2026-08-20T07:55:43: Kind: ltClosure
+[DEBUG] 2026-08-20T07:55:43: Kind: ltTable
+[DEBUG] 2026-08-20T07:55:43: Kind: ltNumber
+[DEBUG] 2026-08-20T07:55:43: IP:    4 | OP:   opConstant | Stack: [function: <main>, table: 0x4305995392, 1.0]
+[DEBUG] 2026-08-20T07:55:43: Kind: ltClosure
+[DEBUG] 2026-08-20T07:55:43: Kind: ltTable
+[DEBUG] 2026-08-20T07:55:43: Kind: ltNumber
+[DEBUG] 2026-08-20T07:55:43: Kind: ltNumber
+[DEBUG] 2026-08-20T07:55:43: IP:    6 | OP:   opSetTable | Stack: [function: <main>, table: 0x4305995392, 1.0, 1.0]
+[DEBUG] 2026-08-20T07:55:43: Kind: ltClosure
+[DEBUG] 2026-08-20T07:55:43: Kind: ltTable
+[DEBUG] 2026-08-20T07:55:43: IP:    7 | OP:   opConstant | Stack: [function: <main>, table: 0x4305995392]
+[DEBUG] 2026-08-20T07:55:43: Kind: ltClosure
+[DEBUG] 2026-08-20T07:55:43: Kind: ltTable
+[DEBUG] 2026-08-20T07:55:43: Kind: ltNumber
+[DEBUG] 2026-08-20T07:55:43: IP:    9 | OP:   opConstant | Stack: [function: <main>, table: 0x4305995392, 2.0]
+[DEBUG] 2026-08-20T07:55:43: Kind: ltClosure
+[DEBUG] 2026-08-20T07:55:43: Kind: ltTable
+[DEBUG] 2026-08-20T07:55:43: Kind: ltNumber
+[DEBUG] 2026-08-20T07:55:43: Kind: ltNumber
+[DEBUG] 2026-08-20T07:55:43: IP:   11 | OP:   opSetTable | Stack: [function: <main>, table: 0x4305995392, 2.0, 2.0]
+[DEBUG] 2026-08-20T07:55:43: Kind: ltClosure
+[DEBUG] 2026-08-20T07:55:43: Kind: ltTable
+[DEBUG] 2026-08-20T07:55:43: IP:   12 | OP:   opConstant | Stack: [function: <main>, table: 0x4305995392]
+[DEBUG] 2026-08-20T07:55:43: Kind: ltClosure
+[DEBUG] 2026-08-20T07:55:43: Kind: ltTable
+[DEBUG] 2026-08-20T07:55:43: Kind: ltNumber
+[DEBUG] 2026-08-20T07:55:43: IP:   14 | OP:   opConstant | Stack: [function: <main>, table: 0x4305995392, 3.0]
+[DEBUG] 2026-08-20T07:55:43: Kind: ltClosure
+[DEBUG] 2026-08-20T07:55:43: Kind: ltTable
+[DEBUG] 2026-08-20T07:55:43: Kind: ltNumber
+[DEBUG] 2026-08-20T07:55:43: Kind: ltNumber
+[DEBUG] 2026-08-20T07:55:43: IP:   16 | OP:   opSetTable | Stack: [function: <main>, table: 0x4305995392, 3.0, 3.0]
+[DEBUG] 2026-08-20T07:55:43: Kind: ltClosure
+[DEBUG] 2026-08-20T07:55:43: Kind: ltTable
+[DEBUG] 2026-08-20T07:55:43: IP:   17 | OP:   opSetLocal | Stack: [function: <main>, table: 0x4305995392]
+[DEBUG] 2026-08-20T07:55:43: Kind: ltClosure
+[DEBUG] 2026-08-20T07:55:43: Kind: ltTable
+[DEBUG] 2026-08-20T07:55:43: IP:   19 | OP:  opGetGlobal | Stack: [function: <main>, table: 0x4305995392]
+[DEBUG] 2026-08-20T07:55:43: Kind: ltClosure
+[DEBUG] 2026-08-20T07:55:43: Kind: ltTable
+[DEBUG] 2026-08-20T07:55:43: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:55:43: IP:   21 | OP:   opGetLocal | Stack: [function: <main>, table: 0x4305995392, function: 0x4305994912]
+[DEBUG] 2026-08-20T07:55:43: Kind: ltClosure
+[DEBUG] 2026-08-20T07:55:43: Kind: ltTable
+[DEBUG] 2026-08-20T07:55:43: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:55:43: Kind: ltTable
+[DEBUG] 2026-08-20T07:55:43: IP:   23 | OP:       opCall | Stack: [function: <main>, table: 0x4305995392, function: 0x4305994912, table: 0x4305995392]
+[DEBUG] 2026-08-20T07:55:43: Kind: ltClosure
+[DEBUG] 2026-08-20T07:55:43: Kind: ltTable
+[DEBUG] 2026-08-20T07:55:43: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:55:43: Kind: ltTable
+[DEBUG] 2026-08-20T07:55:43: Kind: ltNil
+[DEBUG] 2026-08-20T07:55:43: IP:   25 | OP:     opAdjust | Stack: [function: <main>, table: 0x4305995392, function: 0x4305995536, table: 0x4305995392, nil]
+[DEBUG] 2026-08-20T07:55:43: Kind: ltClosure
+[DEBUG] 2026-08-20T07:55:43: Kind: ltTable
+[DEBUG] 2026-08-20T07:55:43: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:55:43: Kind: ltTable
+[DEBUG] 2026-08-20T07:55:43: Kind: ltNil
+[DEBUG] 2026-08-20T07:55:43: IP:   27 | OP:   opGetLocal | Stack: [function: <main>, table: 0x4305995392, function: 0x4305995536, table: 0x4305995392, nil]
+[DEBUG] 2026-08-20T07:55:43: Kind: ltClosure
+[DEBUG] 2026-08-20T07:55:43: Kind: ltTable
+[DEBUG] 2026-08-20T07:55:43: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:55:43: Kind: ltTable
+[DEBUG] 2026-08-20T07:55:43: Kind: ltNil
+[DEBUG] 2026-08-20T07:55:43: Kind: ltNil
+[DEBUG] 2026-08-20T07:55:43: IP:   29 | OP:   opGetLocal | Stack: [function: <main>, table: 0x4305995392, function: 0x4305995536, table: 0x4305995392, nil, nil]
+[DEBUG] 2026-08-20T07:55:43: Kind: ltClosure
+[DEBUG] 2026-08-20T07:55:43: Kind: ltTable
+[DEBUG] 2026-08-20T07:55:43: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:55:43: Kind: ltTable
+[DEBUG] 2026-08-20T07:55:43: Kind: ltNil
+[DEBUG] 2026-08-20T07:55:43: Kind: ltNil
+[DEBUG] 2026-08-20T07:55:43: Kind: ltTable
+[DEBUG] 2026-08-20T07:55:43: IP:   31 | OP:   opGetLocal | Stack: [function: <main>, table: 0x4305995392, function: 0x4305995536, table: 0x4305995392, nil, nil, table: 0x4305995392]
+[DEBUG] 2026-08-20T07:55:43: Kind: ltClosure
+[DEBUG] 2026-08-20T07:55:43: Kind: ltTable
+[DEBUG] 2026-08-20T07:55:43: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:55:43: Kind: ltTable
+[DEBUG] 2026-08-20T07:55:43: Kind: ltNil
+[DEBUG] 2026-08-20T07:55:43: Kind: ltNil
+[DEBUG] 2026-08-20T07:55:43: Kind: ltTable
+[DEBUG] 2026-08-20T07:55:43: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:55:43: IP:   33 | OP:       opCall | Stack: [function: <main>, table: 0x4305995392, function: 0x4305995536, table: 0x4305995392, nil, nil, table: 0x4305995392, function: 0x4305995536]
+[FATAL] 2026-08-20T07:55:43: Runtime Error: Attempt to call a non-function value!
+[DEBUG] 2026-08-20T07:56:01: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:01: IP:    1 | OP:   opNewTable | Stack: [function: <main>]
+[DEBUG] 2026-08-20T07:56:01: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: IP:    2 | OP:   opConstant | Stack: [function: <main>, table: 0x4332750464]
+[DEBUG] 2026-08-20T07:56:01: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:01: IP:    4 | OP:   opConstant | Stack: [function: <main>, table: 0x4332750464, 1.0]
+[DEBUG] 2026-08-20T07:56:01: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:01: IP:    6 | OP:   opSetTable | Stack: [function: <main>, table: 0x4332750464, 1.0, 1.0]
+[DEBUG] 2026-08-20T07:56:01: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: IP:    7 | OP:   opConstant | Stack: [function: <main>, table: 0x4332750464]
+[DEBUG] 2026-08-20T07:56:01: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:01: IP:    9 | OP:   opConstant | Stack: [function: <main>, table: 0x4332750464, 2.0]
+[DEBUG] 2026-08-20T07:56:01: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:01: IP:   11 | OP:   opSetTable | Stack: [function: <main>, table: 0x4332750464, 2.0, 2.0]
+[DEBUG] 2026-08-20T07:56:01: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: IP:   12 | OP:   opConstant | Stack: [function: <main>, table: 0x4332750464]
+[DEBUG] 2026-08-20T07:56:01: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:01: IP:   14 | OP:   opConstant | Stack: [function: <main>, table: 0x4332750464, 3.0]
+[DEBUG] 2026-08-20T07:56:01: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:01: IP:   16 | OP:   opSetTable | Stack: [function: <main>, table: 0x4332750464, 3.0, 3.0]
+[DEBUG] 2026-08-20T07:56:01: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: IP:   17 | OP:   opSetLocal | Stack: [function: <main>, table: 0x4332750464]
+[DEBUG] 2026-08-20T07:56:01: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: IP:   19 | OP:  opGetGlobal | Stack: [function: <main>, table: 0x4332750464]
+[DEBUG] 2026-08-20T07:56:01: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:01: IP:   21 | OP:   opGetLocal | Stack: [function: <main>, table: 0x4332750464, function: 0x4332749984]
+[DEBUG] 2026-08-20T07:56:01: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: IP:   23 | OP:       opCall | Stack: [function: <main>, table: 0x4332750464, function: 0x4332749984, table: 0x4332750464]
+[DEBUG] 2026-08-20T07:56:01: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:01: IP:   25 | OP:     opAdjust | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, nil]
+[DEBUG] 2026-08-20T07:56:01: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:01: IP:   27 | OP:   opGetLocal | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, nil]
+[DEBUG] 2026-08-20T07:56:01: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:01: IP:   29 | OP:   opGetLocal | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, nil, function: 0x4332750608]
+[DEBUG] 2026-08-20T07:56:01: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: IP:   31 | OP:   opGetLocal | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, nil, function: 0x4332750608, table: 0x4332750464]
+[DEBUG] 2026-08-20T07:56:01: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:01: IP:   33 | OP:       opCall | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, nil, function: 0x4332750608, table: 0x4332750464, nil]
+[DEBUG] 2026-08-20T07:56:01: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:01: IP:   35 | OP:     opAdjust | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, nil, 3.0, 3.0]
+[DEBUG] 2026-08-20T07:56:01: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:01: IP:   37 | OP:   opSetLocal | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, nil, 3.0, 3.0]
+[DEBUG] 2026-08-20T07:56:01: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:01: IP:   39 | OP:   opSetLocal | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, nil, 3.0, 3.0]
+[DEBUG] 2026-08-20T07:56:01: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:01: IP:   41 | OP:   opGetLocal | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, nil, 3.0]
+[DEBUG] 2026-08-20T07:56:01: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:01: IP:   43 | OP:   opConstant | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, nil, 3.0, 3.0]
+[DEBUG] 2026-08-20T07:56:01: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:01: IP:   45 | OP:   opNotEqual | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, nil, 3.0, 3.0, nil]
+[DEBUG] 2026-08-20T07:56:01: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:01: Kind: ltBool
+[DEBUG] 2026-08-20T07:56:01: IP:   46 | OP: opJumpIfFalse | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, nil, 3.0, true]
+[DEBUG] 2026-08-20T07:56:01: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:01: Kind: ltBool
+[DEBUG] 2026-08-20T07:56:01: IP:   49 | OP:        opPop | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, nil, 3.0, true]
+[DEBUG] 2026-08-20T07:56:01: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:01: IP:   50 | OP:   opGetLocal | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, nil, 3.0]
+[DEBUG] 2026-08-20T07:56:01: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:01: IP:   52 | OP:   opSetLocal | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, nil, 3.0, 3.0]
+[DEBUG] 2026-08-20T07:56:01: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:01: IP:   54 | OP:  opGetGlobal | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 3.0, 3.0]
+[DEBUG] 2026-08-20T07:56:01: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:01: IP:   56 | OP:   opGetLocal | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 3.0, 3.0, function: 0x4332749840]
+[DEBUG] 2026-08-20T07:56:01: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:01: IP:   58 | OP:       opCall | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 3.0, 3.0, function: 0x4332749840, 3.0]
+[DEBUG] 2026-08-20T07:56:01: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:01: IP:   60 | OP:     opAdjust | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 3.0, 3.0, nil]
+[DEBUG] 2026-08-20T07:56:01: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:01: IP:   62 | OP:        opPop | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 3.0, 3.0, nil]
+[DEBUG] 2026-08-20T07:56:01: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:01: IP:   63 | OP:  opGetGlobal | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 3.0, 3.0]
+[DEBUG] 2026-08-20T07:56:01: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:01: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:01: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: IP:   65 | OP:   opGetLocal | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 3.0, 3.0, function: 0x4332749840]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: IP:   67 | OP:       opCall | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 3.0, 3.0, function: 0x4332749840, function: 0x4332749840]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:02: IP:   69 | OP:     opAdjust | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 3.0, 3.0, nil]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:02: IP:   71 | OP:        opPop | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 3.0, 3.0, nil]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: IP:   72 | OP:       opLoop | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 3.0, 3.0]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: IP:   27 | OP:   opGetLocal | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 3.0, 3.0]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: IP:   29 | OP:   opGetLocal | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 3.0, 3.0, function: 0x4332750608]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: IP:   31 | OP:   opGetLocal | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 3.0, 3.0, function: 0x4332750608, table: 0x4332750464]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: IP:   33 | OP:       opCall | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 3.0, 3.0, function: 0x4332750608, table: 0x4332750464, 3.0]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: IP:   35 | OP:     opAdjust | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 3.0, 3.0, 1.0, 1.0]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: IP:   37 | OP:   opSetLocal | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 3.0, 3.0, 1.0, 1.0]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: IP:   39 | OP:   opSetLocal | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 3.0, 3.0, 1.0]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: IP:   41 | OP:   opGetLocal | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 3.0, 1.0]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: IP:   43 | OP:   opConstant | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 3.0, 1.0, 1.0]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:02: IP:   45 | OP:   opNotEqual | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 3.0, 1.0, 1.0, nil]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltBool
+[DEBUG] 2026-08-20T07:56:02: IP:   46 | OP: opJumpIfFalse | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 3.0, 1.0, true]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltBool
+[DEBUG] 2026-08-20T07:56:02: IP:   49 | OP:        opPop | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 3.0, 1.0, true]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: IP:   50 | OP:   opGetLocal | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 3.0, 1.0]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: IP:   52 | OP:   opSetLocal | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 3.0, 1.0, 1.0]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: IP:   54 | OP:  opGetGlobal | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 1.0, 1.0]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: IP:   56 | OP:   opGetLocal | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 1.0, 1.0, function: 0x4332749840]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: IP:   58 | OP:       opCall | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 1.0, 1.0, function: 0x4332749840, 1.0]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:02: IP:   60 | OP:     opAdjust | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 1.0, 1.0, nil]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:02: IP:   62 | OP:        opPop | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 1.0, 1.0, nil]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: IP:   63 | OP:  opGetGlobal | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 1.0, 1.0]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: IP:   65 | OP:   opGetLocal | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 1.0, 1.0, function: 0x4332749840]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: IP:   67 | OP:       opCall | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 1.0, 1.0, function: 0x4332749840, function: 0x4332749840]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:02: IP:   69 | OP:     opAdjust | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 1.0, 1.0, nil]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:02: IP:   71 | OP:        opPop | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 1.0, 1.0, nil]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: IP:   72 | OP:       opLoop | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 1.0, 1.0]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: IP:   27 | OP:   opGetLocal | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 1.0, 1.0]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: IP:   29 | OP:   opGetLocal | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 1.0, 1.0, function: 0x4332750608]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: IP:   31 | OP:   opGetLocal | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 1.0, 1.0, function: 0x4332750608, table: 0x4332750464]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: IP:   33 | OP:       opCall | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 1.0, 1.0, function: 0x4332750608, table: 0x4332750464, 1.0]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: IP:   35 | OP:     opAdjust | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 1.0, 1.0, 2.0, 2.0]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: IP:   37 | OP:   opSetLocal | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 1.0, 1.0, 2.0, 2.0]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: IP:   39 | OP:   opSetLocal | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 1.0, 1.0, 2.0]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: IP:   41 | OP:   opGetLocal | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 1.0, 2.0]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: IP:   43 | OP:   opConstant | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 1.0, 2.0, 2.0]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:02: IP:   45 | OP:   opNotEqual | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 1.0, 2.0, 2.0, nil]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltBool
+[DEBUG] 2026-08-20T07:56:02: IP:   46 | OP: opJumpIfFalse | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 1.0, 2.0, true]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltBool
+[DEBUG] 2026-08-20T07:56:02: IP:   49 | OP:        opPop | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 1.0, 2.0, true]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: IP:   50 | OP:   opGetLocal | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 1.0, 2.0]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: IP:   52 | OP:   opSetLocal | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 1.0, 2.0, 2.0]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: IP:   54 | OP:  opGetGlobal | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 2.0, 2.0]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: IP:   56 | OP:   opGetLocal | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 2.0, 2.0, function: 0x4332749840]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: IP:   58 | OP:       opCall | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 2.0, 2.0, function: 0x4332749840, 2.0]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:02: IP:   60 | OP:     opAdjust | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 2.0, 2.0, nil]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:02: IP:   62 | OP:        opPop | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 2.0, 2.0, nil]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: IP:   63 | OP:  opGetGlobal | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 2.0, 2.0]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: IP:   65 | OP:   opGetLocal | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 2.0, 2.0, function: 0x4332749840]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: IP:   67 | OP:       opCall | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 2.0, 2.0, function: 0x4332749840, function: 0x4332749840]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:02: IP:   69 | OP:     opAdjust | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 2.0, 2.0, nil]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:02: IP:   71 | OP:        opPop | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 2.0, 2.0, nil]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: IP:   72 | OP:       opLoop | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 2.0, 2.0]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: IP:   27 | OP:   opGetLocal | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 2.0, 2.0]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: IP:   29 | OP:   opGetLocal | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 2.0, 2.0, function: 0x4332750608]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: IP:   31 | OP:   opGetLocal | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 2.0, 2.0, function: 0x4332750608, table: 0x4332750464]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: IP:   33 | OP:       opCall | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 2.0, 2.0, function: 0x4332750608, table: 0x4332750464, 2.0]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:02: IP:   35 | OP:     opAdjust | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 2.0, 2.0, nil]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:02: IP:   37 | OP:   opSetLocal | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 2.0, 2.0, nil, nil]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:02: IP:   39 | OP:   opSetLocal | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 2.0, 2.0, nil]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:02: IP:   41 | OP:   opGetLocal | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 2.0, nil]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:02: IP:   43 | OP:   opConstant | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 2.0, nil, nil]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:02: IP:   45 | OP:   opNotEqual | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 2.0, nil, nil, nil]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:02: Kind: ltBool
+[DEBUG] 2026-08-20T07:56:02: IP:   46 | OP: opJumpIfFalse | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 2.0, nil, false]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:02: Kind: ltBool
+[DEBUG] 2026-08-20T07:56:02: IP:   75 | OP:        opPop | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 2.0, nil, false]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:02: IP:   76 | OP:        opPop | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 2.0, nil]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:02: IP:   77 | OP:        opPop | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464, 2.0]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: IP:   78 | OP:        opPop | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608, table: 0x4332750464]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:02: IP:   79 | OP:        opPop | Stack: [function: <main>, table: 0x4332750464, function: 0x4332750608]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:02: IP:   80 | OP:        opPop | Stack: [function: <main>, table: 0x4332750464]
+[DEBUG] 2026-08-20T07:56:02: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:02: IP:   81 | OP:     opReturn | Stack: [function: <main>]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: IP:    1 | OP:   opNewTable | Stack: [function: <main>]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: IP:    2 | OP:   opConstant | Stack: [function: <main>, table: 0x4343907968]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltString
+[DEBUG] 2026-08-20T07:56:44: IP:    4 | OP:   opConstant | Stack: [function: <main>, table: 0x4343907968, "a"]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltString
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: IP:    6 | OP:   opSetTable | Stack: [function: <main>, table: 0x4343907968, "a", 1.0]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: IP:    7 | OP:   opConstant | Stack: [function: <main>, table: 0x4343907968]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltString
+[DEBUG] 2026-08-20T07:56:44: IP:    9 | OP:   opConstant | Stack: [function: <main>, table: 0x4343907968, "b"]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltString
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: IP:   11 | OP:   opSetTable | Stack: [function: <main>, table: 0x4343907968, "b", 2.0]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: IP:   12 | OP:   opConstant | Stack: [function: <main>, table: 0x4343907968]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltString
+[DEBUG] 2026-08-20T07:56:44: IP:   14 | OP:   opConstant | Stack: [function: <main>, table: 0x4343907968, "c"]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltString
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: IP:   16 | OP:   opSetTable | Stack: [function: <main>, table: 0x4343907968, "c", 3.0]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: IP:   17 | OP:   opSetLocal | Stack: [function: <main>, table: 0x4343907968]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: IP:   19 | OP:  opGetGlobal | Stack: [function: <main>, table: 0x4343907968]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: IP:   21 | OP:   opGetLocal | Stack: [function: <main>, table: 0x4343907968, function: 0x4343907488]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: IP:   23 | OP:       opCall | Stack: [function: <main>, table: 0x4343907968, function: 0x4343907488, table: 0x4343907968]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:44: IP:   25 | OP:     opAdjust | Stack: [function: <main>, table: 0x4343907968, function: 0x4343908112, table: 0x4343907968, nil]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:44: IP:   27 | OP:   opGetLocal | Stack: [function: <main>, table: 0x4343907968, function: 0x4343908112, table: 0x4343907968, nil]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: IP:   29 | OP:   opGetLocal | Stack: [function: <main>, table: 0x4343907968, function: 0x4343908112, table: 0x4343907968, nil, function: 0x4343908112]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: IP:   31 | OP:   opGetLocal | Stack: [function: <main>, table: 0x4343907968, function: 0x4343908112, table: 0x4343907968, nil, function: 0x4343908112, table: 0x4343907968]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:44: IP:   33 | OP:       opCall | Stack: [function: <main>, table: 0x4343907968, function: 0x4343908112, table: 0x4343907968, nil, function: 0x4343908112, table: 0x4343907968, nil]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:44: Kind: ltString
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: IP:   35 | OP:     opAdjust | Stack: [function: <main>, table: 0x4343907968, function: 0x4343908112, table: 0x4343907968, nil, "b", 2.0]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:44: Kind: ltString
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: IP:   37 | OP:   opSetLocal | Stack: [function: <main>, table: 0x4343907968, function: 0x4343908112, table: 0x4343907968, nil, "b", 2.0]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:44: Kind: ltString
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: IP:   39 | OP:   opSetLocal | Stack: [function: <main>, table: 0x4343907968, function: 0x4343908112, table: 0x4343907968, nil, "b", 2.0]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: IP:   41 | OP:   opGetLocal | Stack: [function: <main>, table: 0x4343907968, function: 0x4343908112, table: 0x4343907968, nil, 2.0]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: IP:   43 | OP:   opConstant | Stack: [function: <main>, table: 0x4343907968, function: 0x4343908112, table: 0x4343907968, nil, 2.0, 2.0]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:44: IP:   45 | OP:   opNotEqual | Stack: [function: <main>, table: 0x4343907968, function: 0x4343908112, table: 0x4343907968, nil, 2.0, 2.0, nil]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: Kind: ltBool
+[DEBUG] 2026-08-20T07:56:44: IP:   46 | OP: opJumpIfFalse | Stack: [function: <main>, table: 0x4343907968, function: 0x4343908112, table: 0x4343907968, nil, 2.0, true]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: Kind: ltBool
+[DEBUG] 2026-08-20T07:56:44: IP:   49 | OP:        opPop | Stack: [function: <main>, table: 0x4343907968, function: 0x4343908112, table: 0x4343907968, nil, 2.0, true]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: IP:   50 | OP:   opGetLocal | Stack: [function: <main>, table: 0x4343907968, function: 0x4343908112, table: 0x4343907968, nil, 2.0]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: IP:   52 | OP:   opSetLocal | Stack: [function: <main>, table: 0x4343907968, function: 0x4343908112, table: 0x4343907968, nil, 2.0, 2.0]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: IP:   54 | OP:  opGetGlobal | Stack: [function: <main>, table: 0x4343907968, function: 0x4343908112, table: 0x4343907968, 2.0, 2.0]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: IP:   56 | OP:   opGetLocal | Stack: [function: <main>, table: 0x4343907968, function: 0x4343908112, table: 0x4343907968, 2.0, 2.0, function: 0x4343907344]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: IP:   58 | OP:       opCall | Stack: [function: <main>, table: 0x4343907968, function: 0x4343908112, table: 0x4343907968, 2.0, 2.0, function: 0x4343907344, 2.0]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:44: IP:   60 | OP:     opAdjust | Stack: [function: <main>, table: 0x4343907968, function: 0x4343908112, table: 0x4343907968, 2.0, 2.0, nil]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:44: IP:   62 | OP:        opPop | Stack: [function: <main>, table: 0x4343907968, function: 0x4343908112, table: 0x4343907968, 2.0, 2.0, nil]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: IP:   63 | OP:  opGetGlobal | Stack: [function: <main>, table: 0x4343907968, function: 0x4343908112, table: 0x4343907968, 2.0, 2.0]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: IP:   65 | OP:   opGetLocal | Stack: [function: <main>, table: 0x4343907968, function: 0x4343908112, table: 0x4343907968, 2.0, 2.0, function: 0x4343907344]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: IP:   67 | OP:       opCall | Stack: [function: <main>, table: 0x4343907968, function: 0x4343908112, table: 0x4343907968, 2.0, 2.0, function: 0x4343907344, function: 0x4343907344]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:44: IP:   69 | OP:     opAdjust | Stack: [function: <main>, table: 0x4343907968, function: 0x4343908112, table: 0x4343907968, 2.0, 2.0, nil]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:44: IP:   71 | OP:        opPop | Stack: [function: <main>, table: 0x4343907968, function: 0x4343908112, table: 0x4343907968, 2.0, 2.0, nil]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: IP:   72 | OP:       opLoop | Stack: [function: <main>, table: 0x4343907968, function: 0x4343908112, table: 0x4343907968, 2.0, 2.0]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: IP:   27 | OP:   opGetLocal | Stack: [function: <main>, table: 0x4343907968, function: 0x4343908112, table: 0x4343907968, 2.0, 2.0]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: IP:   29 | OP:   opGetLocal | Stack: [function: <main>, table: 0x4343907968, function: 0x4343908112, table: 0x4343907968, 2.0, 2.0, function: 0x4343908112]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: IP:   31 | OP:   opGetLocal | Stack: [function: <main>, table: 0x4343907968, function: 0x4343908112, table: 0x4343907968, 2.0, 2.0, function: 0x4343908112, table: 0x4343907968]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: IP:   33 | OP:       opCall | Stack: [function: <main>, table: 0x4343907968, function: 0x4343908112, table: 0x4343907968, 2.0, 2.0, function: 0x4343908112, table: 0x4343907968, 2.0]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:44: IP:   35 | OP:     opAdjust | Stack: [function: <main>, table: 0x4343907968, function: 0x4343908112, table: 0x4343907968, 2.0, 2.0, nil]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:44: IP:   37 | OP:   opSetLocal | Stack: [function: <main>, table: 0x4343907968, function: 0x4343908112, table: 0x4343907968, 2.0, 2.0, nil, nil]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:44: IP:   39 | OP:   opSetLocal | Stack: [function: <main>, table: 0x4343907968, function: 0x4343908112, table: 0x4343907968, 2.0, 2.0, nil]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:44: IP:   41 | OP:   opGetLocal | Stack: [function: <main>, table: 0x4343907968, function: 0x4343908112, table: 0x4343907968, 2.0, nil]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:44: IP:   43 | OP:   opConstant | Stack: [function: <main>, table: 0x4343907968, function: 0x4343908112, table: 0x4343907968, 2.0, nil, nil]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:44: IP:   45 | OP:   opNotEqual | Stack: [function: <main>, table: 0x4343907968, function: 0x4343908112, table: 0x4343907968, 2.0, nil, nil, nil]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:44: Kind: ltBool
+[DEBUG] 2026-08-20T07:56:44: IP:   46 | OP: opJumpIfFalse | Stack: [function: <main>, table: 0x4343907968, function: 0x4343908112, table: 0x4343907968, 2.0, nil, false]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:44: Kind: ltBool
+[DEBUG] 2026-08-20T07:56:44: IP:   75 | OP:        opPop | Stack: [function: <main>, table: 0x4343907968, function: 0x4343908112, table: 0x4343907968, 2.0, nil, false]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNil
+[DEBUG] 2026-08-20T07:56:44: IP:   76 | OP:        opPop | Stack: [function: <main>, table: 0x4343907968, function: 0x4343908112, table: 0x4343907968, 2.0, nil]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNumber
+[DEBUG] 2026-08-20T07:56:44: IP:   77 | OP:        opPop | Stack: [function: <main>, table: 0x4343907968, function: 0x4343908112, table: 0x4343907968, 2.0]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: IP:   78 | OP:        opPop | Stack: [function: <main>, table: 0x4343907968, function: 0x4343908112, table: 0x4343907968]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: Kind: ltNativeFn
+[DEBUG] 2026-08-20T07:56:44: IP:   79 | OP:        opPop | Stack: [function: <main>, table: 0x4343907968, function: 0x4343908112]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: Kind: ltTable
+[DEBUG] 2026-08-20T07:56:44: IP:   80 | OP:        opPop | Stack: [function: <main>, table: 0x4343907968]
+[DEBUG] 2026-08-20T07:56:44: Kind: ltClosure
+[DEBUG] 2026-08-20T07:56:44: IP:   81 | OP:     opReturn | Stack: [function: <main>]
+[DEBUG] 2026-08-20T08:05:53: Tkdots? tkDots
+[DEBUG] 2026-08-20T08:05:53: Isvararg: true
+[DEBUG] 2026-08-20T08:05:53: Isvararg before fn def: true
+[INFO] 2026-08-20T08:05:53: Node name: testVariadic
+[INFO] 2026-08-20T08:05:53: Node vararg: true
+[FATAL] 2026-08-20T13:36:51: Runtime Error: Attempt to index a nil value
+[DEBUG] 2026-08-20T14:08:06: Tkdots? tkIdent
+[DEBUG] 2026-08-20T14:08:06: Isvararg before fn def: false
+[INFO] 2026-08-20T14:08:06: Node name: myTest
+[INFO] 2026-08-20T14:08:06: Node vararg: false
+[INFO] 2026-08-20T14:09:35: Node name: <anonymous>
+[INFO] 2026-08-20T14:09:35: Node vararg: false
+[FATAL] 2026-08-20T17:00:27: Syntax Error: Expected expression. Kind: tkLess

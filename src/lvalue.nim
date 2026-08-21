@@ -1,43 +1,7 @@
 import std/[tables, hashes]
 from strutils import toHex
-import lerror
+import lerror,ltypes
 
-
-
-type
-  LuaUpValue* = ref object
-    location*: int
-    value*: LuaValue
-    isOpen*: bool
-    isLocal*: bool
-    closed*: LuaValue
-  LuaClosure* = ref object
-    fn*: LuaFunction
-    upvalues*: seq[LuaUpValue]
-  Chunk* = ref object
-    code*: seq[uint8]         # The flat array of instructions
-    constants*: seq[LuaValue] # The pool of raw values (from Phase 1!)
-    lines*: seq[int]
-  LuaKind* = enum
-    ltNil, ltBool, ltNumber, ltString, ltTable, ltNativeFn, ltClosure
-  LuaFunction* = ref object
-    name*: string 
-    arity*: int  
-    chunk*: Chunk
-    isVararg*: bool
-  NativeFunc* = proc(args: varargs[LuaValue]): LuaValue
-  LuaTable* = TableRef[LuaValue, LuaValue]
-  LuaValue* = ref object
-    case kind: LuaKind
-    of ltNil: discard
-    of ltBool: bval*: bool
-    of ltNumber: nval*: float64
-    of ltString: sval*: string
-    of ltTable: 
-      tval*: LuaTable
-      mt*: LuaValue
-    of ltClosure: fnVal*: LuaClosure
-    of ltNativeFn: nativeFn*: NativeFunc
 
 proc `==`*(a, b: LuaValue): bool
 proc hash*(v: LuaValue): Hash
@@ -62,12 +26,20 @@ func isNumber*(v: LuaValue): bool = v.kind == ltNumber
 func isString*(v: LuaValue): bool = v.kind == ltString
 func isTable*(v: LuaValue): bool = v.kind == ltTable
 func isNimFn*(v: LuaValue): bool = v.kind == ltNativeFn
+func isNimFnVM*(v:LuaValue): bool = v.kind == ltNativeFnVM
+func isLuaFn*(v: LuaValue): bool = v.kind == ltClosure
 # Helper constructor
 proc newLuaValue(kind: LuaKind): LuaValue = LuaValue(kind: kind)
 proc newLuaNil*(): LuaValue = newLuaValue(ltNil)
+
 proc newNimFn*(fn: NativeFunc): LuaValue =
   result = newLuaValue(ltNativeFn)
   result.nativefn = fn
+
+proc newNimFnVM*(fn: NativeFuncVM): LuaValue =
+  result = newLuaValue(ltNativeFnVM)
+  result.nativeFnVM = fn
+
 proc newLuaFunction*(name: string, arity: int, chunk: Chunk,isVararg:bool = false): LuaFunction = LuaFunction(name: name, arity: arity, chunk: chunk,isVararg:isVararg)
 
 proc wrapLuaClosure*(name: string,arity:int,chunk:Chunk,isVararg:bool = false): LuaValue =
@@ -105,7 +77,7 @@ proc truthy*(a:LuaValue): bool =
   case a.kind
   of ltNil: false
   of ltBool: a.bval
-  of ltNumber,ltString,ltTable,ltClosure,ltNativeFn: true
+  of ltNumber,ltString,ltTable,ltClosure,ltNativeFn,ltNativeFnVM: true
     
 
 proc `==`*(a, b: LuaValue): bool =
@@ -119,7 +91,7 @@ proc `==`*(a, b: LuaValue): bool =
   of ltString: a.sval == b.sval
   of ltTable: a.tval == b.tval
   of ltClosure: a.fnVal.fn == b.fnVal.fn
-  of ltNativeFn: false
+  of ltNativeFn,ltNativeFnVM: false
 
 proc hash*(v: LuaValue): Hash =
   case v.kind
@@ -130,6 +102,7 @@ proc hash*(v: LuaValue): Hash =
   of ltClosure: addr(v.fnVal).hash()
   of ltTable: addr(v.tval).hash()
   of ltNativeFn: addr(v.nativeFn).hash()
+  of ltNativeFnVM: addr(v.nativeFnVM).hash()
 
 proc newLuaTable*(): LuaValue =
   result = newLuaValue(ltTable)
@@ -143,7 +116,7 @@ proc `$`*(v: LuaValue): string =
   of ltNumber: $v.nval
   of ltString: "\"" & v.sval & "\""
   of ltClosure: "function: " & v.fnVal.fn.name
-  of ltNativeFn: "function: 0x" & $cast[int](v)
+  of ltNativeFn,ltNativeFnVM: "function: 0x" & $cast[int](v)
   of ltTable: "table: 0x" & $cast[int](v)
 
 proc expect(v: LuaValue, k: LuaKind): bool = v.kind == k
