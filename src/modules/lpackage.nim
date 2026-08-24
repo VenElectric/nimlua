@@ -1,6 +1,6 @@
 import std/[os,tables]
 from strutils import replace
-import ../ltypes, ../lvalue, ../lerror, ../llex, ../lparse, ../lvm
+import ../ltypes, ../lvalue, ../lerror, ../llex, ../lparse, ../lvm, ../lcompiler
 
 proc newPackageLib*(): LuaValue =
   result = newLuaTable()
@@ -29,15 +29,16 @@ proc luaRequire*(vm: var VM, args: varargs[LuaValue]): seq[LuaValue] =
   let ast = parser.parseBlock()
 
   var moduleChunk = initChunk()
-  var compiler = lvm.newCompiler()
+  var compiler = newCompiler()
   compiler.compile(ast, moduleChunk, 1)
   moduleChunk.writeChunk(uint8(opReturn), 1)
   moduleChunk.writeChunk(0'u8, 1)
 
   let stopDepth = vm.frames.len
   var modClosure = newLuaClosure(modName, 0, moduleChunk)
-  vm.stack.add(wrapLuaClosure(modName, 0, moduleChunk))
-  vm.frames.add(CallFrame(closure: modClosure, ip: 0, slotBase: vm.stack.len - 1))
+  vm.stack.add(wrapLuaClosure(modClosure))   # slot 0: closure
+  vm.stack.add(vm.globals["_G"])              # slot 1: _ENV
+  vm.frames.add(CallFrame(closure: modClosure, ip: 0, slotBase: vm.stack.len - 2))
   discard vm.run(stopDepth)
   
   let resultVal = if vm.lastReturnCount > 0: vm.pop() else: newLuaBool(true)

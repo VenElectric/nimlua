@@ -4,3 +4,5 @@ type
   LuaSyntaxError* = object of LuaError
   LuaCompileError* = object of LuaError
   LuaRuntimeError* = object of LuaError
+  LuaExitError* = object of LuaError
+    code*: int

@@ -1,24 +1,28 @@
-import std/[lexbase, tables, streams, strutils, parseutils, logging]
+import std/[lexbase, tables, streams, strutils, parseutils]
 import lerror
 
 type
   TokenKind* = enum
     # Single-character tokens
     tkPlus, tkMinus, tkStar, tkSlash, tkAssign, tkLeftParen, tkRightParen,
-    tkTilde,tkAmp,tkPipe, tkComma, tkLeftBracket, tkRightBracket, 
-    tkLeftBrace, tkRightBrace, tkDot,tkLess,tkGreater,tkCaret,tkPercent,tkHash,tkColon
+    tkTilde, tkAmp, tkPipe, tkComma, tkLeftBracket, tkRightBracket,
+    tkLeftBrace, tkRightBrace, tkDot, tkLess, tkGreater, tkCaret, tkPercent,
+      tkHash, tkColon
 
     # Two-character tokens
-    tkEquals, tkNotEquals, tkLessEqual, tkGreaterEqual, tkConcat,tkLeftShift,tkRightShift,tkDoubleSlash,tkDbColon
+    tkEquals, tkNotEquals, tkLessEqual, tkGreaterEqual, tkConcat, tkLeftShift,
+      tkRightShift, tkDoubleSlash, tkDbColon
 
     # Three character tokens
     tkDots
     # Literals
-    tkIdent, tkString, tkNumber,tkTrue,tkFalse,tkNil
+    tkIdent, tkString, tkNumber, tkTrue, tkFalse, tkNil
 
     # Keywords
-    tkLocal, tkFunction, tkIf, tkElseIf,tkElse,tkThen, tkEnd, tkReturn, tkGlobal,
-    tkWhile,tkRepeat,tkFor,tkDo,tkBreak,tkAnd,tkNot,tkOr,tkGoto,tkIn
+    tkLocal, tkFunction, tkIf, tkElseIf, tkElse, tkThen, tkEnd, tkReturn,
+      tkGlobal,
+    tkWhile, tkRepeat, tkFor, tkDo, tkBreak, tkAnd, tkNot, tkOr, tkGoto, tkIn,
+      tkEnum, tkUntil
 
     # Special
     tkEOF, tkError
@@ -40,8 +44,6 @@ func createToken(line: int, kind: TokenKind, lexeme: string): Token = Token(
 
 func createEOFToken(line: int): Token = result = createToken(line, tkEOF, "eof")
 
-func createErrorToken(line: int, msg: string): Token = createToken(line,
-    tkError, msg)
 
 const keywords = {
   "local": tkLocal,
@@ -65,7 +67,9 @@ const keywords = {
   "and": tkAnd,
   "or": tkOr,
   "goto": tkGoto,
-  "in": tkIn
+  "in": tkIn,
+  "enum": tkEnum,
+  "until": tkUntil
 }.toTable
 
 using
@@ -91,13 +95,97 @@ proc match(vl; c: char): bool =
     discard vl.advance()
     result = true
 
-proc parseUntil(vl; until: set[char]): string = inc(vl.bufpos, parseUntil(
-    vl.buf, result, until, vl.bufpos))
-proc parseUntil(vl; until: char): string = inc(vl.bufpos, parseUntil(vl.buf,
-    result, until, vl.bufpos))
 proc parseWhile(vl; whle: set[char]): string = inc(vl.bufpos, parseWhile(vl.buf,
     result, whle, vl.bufpos))
 
+
+proc scanLineComment(vl) =
+  while true:
+    let c = vl.peek()
+    if c == EndOfFile or c in lexbase.NewLines:
+      return # leave the newline itself for scanToken's own (now-fixed) handling
+    discard vl.advance()
+
+proc scanQuotedString(vl; quote: char): string =
+  result = ""
+  while true:
+    let c = vl.peek()
+    if c == EndOfFile or c in lexbase.NewLines:
+      raise newException(LuaSyntaxError, "Unterminated string")
+    if c == quote:
+      discard vl.advance()
+      return result
+    if c == '\\':
+      discard vl.advance()   # consume the backslash
+      let esc = vl.peek()
+      case esc
+      of 'n': result.add('\n'); discard vl.advance()
+      of 't': result.add('\t'); discard vl.advance()
+      of 'r': result.add('\r'); discard vl.advance()
+      of 'a': result.add('\a'); discard vl.advance()
+      of 'b': result.add('\b'); discard vl.advance()
+      of 'f': result.add('\f'); discard vl.advance()
+      of 'v': result.add('\v'); discard vl.advance()
+      of '\\': result.add('\\'); discard vl.advance()
+      of '"': result.add('"'); discard vl.advance()
+      of '\'': result.add('\''); discard vl.advance()
+      of 'x':
+        discard vl.advance()
+        var hex = ""
+        for _ in 0 ..< 2:
+          if vl.peek() in HexDigits: hex.add(vl.advance())
+          else: raise newException(LuaSyntaxError, "hexadecimal digit expected in \\x escape")
+        result.add(char(parseHexInt(hex)))
+      of '0'..'9':
+        var dec = ""
+        for _ in 0 ..< 3:
+          if vl.peek() in Digits: dec.add(vl.advance())
+          else: break
+        let code = parseInt(dec)
+        if code > 255:
+          raise newException(LuaSyntaxError, "decimal escape too large")
+        result.add(char(code))
+      of 'z':
+        # \z skips all following whitespace, including real newlines -- a
+        # readability aid for breaking a long string across source lines
+        discard vl.advance()
+        while vl.peek() in {' ', '\t'} or vl.peek() in lexbase.NewLines:
+          if vl.peek() in lexbase.NewLines:
+            if vl.peek() == '\c': vl.bufpos = vl.handleCR(vl.bufpos)
+            else: vl.bufpos = vl.handleLF(vl.bufpos)
+            inc(vl.lineNum)
+          else:
+            discard vl.advance()
+      of lexbase.NewLines:
+        # backslash immediately followed by a real newline embeds ONE newline
+        if esc == '\c': vl.bufpos = vl.handleCR(vl.bufpos)
+        else: vl.bufpos = vl.handleLF(vl.bufpos)
+        inc(vl.lineNum)
+        result.add('\n')
+      else:
+        raise newException(LuaSyntaxError, "invalid escape sequence '\\" & esc & "'")
+    else:
+      result.add(vl.advance())
+
+proc scanLongString(vl): string =
+  result = ""
+  while true:
+    let c = vl.peek()
+    if c == EndOfFile:
+      raise newException(LuaSyntaxError, "Unterminated long string")
+    if c == ']' and vl.peek(1) == ']':
+      discard vl.advance()
+      discard vl.advance()
+      return result
+    if c in lexbase.NewLines:
+      if c == '\c':
+        vl.bufpos = vl.handleCR(vl.bufpos)
+      else:
+        vl.bufpos = vl.handleLF(vl.bufpos)
+      inc(vl.lineNum)
+      result.add('\n')
+    else:
+      result.add(vl.advance())
 
 proc scanToken(vl): Token =
   if vl.atEnd():
@@ -110,12 +198,18 @@ proc scanToken(vl): Token =
     # Ignore whitespace and just scan the next token
     return vl.scanToken()
   of lexbase.NewLines:
+    if c == '\c':
+      vl.bufpos = vl.handleCR(vl.bufpos - 1)
+    else:
+      vl.bufpos = vl.handleLF(vl.bufpos - 1)
     inc(vl.lineNum)
     return vl.scanToken()
   of '+': return createToken(vl.lineNum, tkPlus, "+")
-  of '-': 
+  of ';':
+    return vl.scanToken()
+  of '-':
     if vl.match('-'):
-      inc(vl.bufpos,skipUntil(vl.buf,'\n'))
+      vl.scanLineComment()
       return vl.scanToken()
     else:
       return createToken(vl.lineNum, tkMinus, "-")
@@ -132,67 +226,60 @@ proc scanToken(vl): Token =
   of '}':
     return createToken(vl.lineNum, tkRightBrace, "}")
   of '&':
-    return createToken(vl.lineNum,tkAmp,"&")
+    return createToken(vl.lineNum, tkAmp, "&")
   of '|':
-    return createToken(vl.lineNum,tkPipe,"|")
+    return createToken(vl.lineNum, tkPipe, "|")
   of '^':
-    return createToken(vl.lineNum,tkCaret,"^")
+    return createToken(vl.lineNum, tkCaret, "^")
   of '*':
-    return createToken(vl.lineNum,tkStar,"*")
+    return createToken(vl.lineNum, tkStar, "*")
   of '%':
-    return createToken(vl.lineNum,tkPercent,"%")
+    return createToken(vl.lineNum, tkPercent, "%")
   of '#':
-    return createToken(vl.lineNum,tkHash,"#")
+    return createToken(vl.lineNum, tkHash, "#")
   of ':':
     if vl.match(':'):
-      return createToken(vl.lineNum,tkDbColon,"::")
+      return createToken(vl.lineNum, tkDbColon, "::")
     else:
-      return createToken(vl.lineNum,tkColon,":")
+      return createToken(vl.lineNum, tkColon, ":")
   of '/':
     if vl.match('/'):
-      return createToken(vl.lineNum,tkDoubleSlash,"//")
+      return createToken(vl.lineNum, tkDoubleSlash, "//")
     else:
-      return createToken(vl.lineNum,tkSlash,"/")
+      return createToken(vl.lineNum, tkSlash, "/")
   of '<':
     if vl.match('='):
-      return createToken(vl.lineNum,tkLessEqual,"<=")
+      return createToken(vl.lineNum, tkLessEqual, "<=")
     elif vl.match('<'):
-      return createToken(vl.lineNum,tkLeftShift,"<<")
+      return createToken(vl.lineNum, tkLeftShift, "<<")
     else:
-      return createToken(vl.lineNum,tkLess,"<")
+      return createToken(vl.lineNum, tkLess, "<")
   of '>':
     if vl.match('='):
-      return createToken(vl.lineNum,tkGreaterEqual,">=")
+      return createToken(vl.lineNum, tkGreaterEqual, ">=")
     elif vl.match('>'):
-      return createToken(vl.lineNum,tkRightShift,">>")
+      return createToken(vl.lineNum, tkRightShift, ">>")
     else:
-      return createToken(vl.lineNum,tkGreater,">")
+      return createToken(vl.lineNum, tkGreater, ">")
   of '.':
     if vl.peek(0) == '.' and vl.peek(1) == '.':
-      
+
       inc(vl.bufpos, 2)
       return createToken(vl.lineNum, tkDots, "...")
     elif vl.peek(0) == '.':
-      
+
       inc(vl.bufpos, 1)
       return createToken(vl.lineNum, tkConcat, "..")
     else:
       return createToken(vl.lineNum, tkDot, ".")
   of '[':
     if vl.match('['):
-      let text = vl.parseUntil(']')
-      if vl.atEnd():
-        raise newException(LuaSyntaxError, "Unterminated long string")
-      inc(vl.lineNum, countLines(text))
-      inc(vl.bufpos, 2) # skip ]]
+      let text = vl.scanLongString()
       return createToken(vl.lineNum, tkString, text)
     else:
       return createToken(vl.lineNum, tkLeftBracket, "[")
   of '"', '\'':
-    let text = vl.parseUntil({c} + lexbase.NewLines)
-    if vl.atEnd() or vl.peek() == '\n':
-      raise newException(LuaSyntaxError, "Unterminated string")
-    inc(vl.bufpos)
+    let text = vl.scanQuotedString(c)
     return createToken(vl.lineNum, tkString, text)
   of '~':
     if vl.match('='):
@@ -207,10 +294,17 @@ proc scanToken(vl): Token =
   else:
     # Multi-character tokens (Numbers and Identifiers)
     if c.isDigit():
-      dec vl.bufpos
-      let numStr = vl.parseWhile(Digits + {'.'})
-      return createToken(vl.lineNum, tkNumber, numStr)
-
+      if c == '0' and (vl.peek() == 'x' or vl.peek() == 'X'):
+        discard vl.advance()   # consume the 'x'/'X'
+        let hexDigits = vl.parseWhile(HexDigits)
+        if hexDigits.len == 0:
+          raise newException(LuaSyntaxError, "malformed number near '0x'")
+        let value = parseHexInt(hexDigits)
+        return createToken(vl.lineNum, tkNumber, $value)
+      else:
+        dec vl.bufpos
+        let numStr = vl.parseWhile(Digits + {'.', 'e', 'E'})
+        return createToken(vl.lineNum, tkNumber, numStr)
     elif c.isAlphaAscii() or c == '_':
       dec vl.bufpos
       let ident = vl.parseWhile(IdentChars)
@@ -230,6 +324,5 @@ proc tokenize*(source: string): seq[Token] =
   result = @[]
   while true:
     let tok = vl.scanToken()
-
     result.add(tok)
     if tok.kind == tkEOF: break

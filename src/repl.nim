@@ -1,5 +1,5 @@
 import std/[strutils, rdstdin] # rdstdin provides a nice prompt with line-editing capabilities
-import lvm, lparse, llex, lvalue,ltypes
+import lvm, lcompiler, lparse, llex, lvalue, ltypes
 # Assume all your previous code (Lexer, Parser, Compiler, VM) is imported or pasted above this.
 
 proc repl*(vm: var VM) =

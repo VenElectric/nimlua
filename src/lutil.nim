@@ -1,10 +1,10 @@
 import std/[strutils]
-import lvalue,ltypes
+import lvalue, ltypes
 
 proc parseBaseN(s: string, base: int): (bool, int64) =
   var idx = 0
   var sign: int64 = 1
-  
+
   if idx < s.len and s[idx] == '-':
     sign = -1
     inc idx
@@ -67,7 +67,7 @@ proc luaUToNumber*(val: LuaValue, base: int = 10): LuaValue =
     # Non-10 base only accepts string inputs (or numbers converted to string without base prefixes)
     if not isString(val) and not isNumber(val):
       return newLuaNil()
-    
+
     let strVal = if isString(val): val.sval else: $val
     let s = strVal.strip()
     let (ok, res) = parseBaseN(s, base)
@@ -75,3 +75,8 @@ proc luaUToNumber*(val: LuaValue, base: int = 10): LuaValue =
       return newLuaNumber(res.float64)
     else:
       return newLuaNil()
+# bad argument #1 to 'remove' (table expected)
+# Invalid # of arguments to 'sin'. Expected one argument.
+proc moduleArgKindErrorFmt*(pos:int,fnName,kind:string): string = "bad argument #" & $pos & " to '" & fnName & "' (" & kind & " expected)"
+proc moduleArgKindsErrorFmt*(pos:int,fnName:string,kinds:openArray[string]): string = "bad argument #" & $pos & " to '" & fnName & "' (" & kinds.join(",") & " expected)"
+proc moduleArgNumErrorFmt*(fnName,numArgs:string): string = "invalid # of arguments to '" & fnName & "'. Expected " & numArgs & "."

@@ -1,1 +1,1 @@
-local a<const>,b,c<const> = 1,2,3
+print(string.char())
