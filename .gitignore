@@ -8,5 +8,4 @@ src/lua54/testfiles
 .idea
 .zed
 lua54
-test.lua
 luavm.log
