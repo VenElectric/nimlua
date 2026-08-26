@@ -1,3 +1,3 @@
-local x = "hello"
+local y = "hello,world"
 
-print(x:rep(3,","))
+print(y:split(","))

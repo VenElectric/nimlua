@@ -1,0 +1,8 @@
+{
+  "workspace.library": ["./stubs"],
+  "diagnostics.globals": [
+    "file", "dir", "set", "unicode", "json", "net", "time", "process",
+    "FileMode", "PathKind", "HttpMethod", "Month", "Weekday", "GCOption",
+    "TypeKind", "collectgarbage", "rawtype"
+  ]
+}
