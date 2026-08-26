@@ -15,7 +15,7 @@ import ../../src/lvm
 ##   - VM.output*: Stream added to ltypes.nim
 ##   - lauxlib.interpret() defaults vm.output to a real stdout stream when nil
 ##   - luaPrint is vm-aware (NativeFuncVM) and writes through vm.output
-proc runLua*(source: string): string =
+proc runLua*(source: string,moduleFlags:set[ModuleFlags] = ALLMODULES): string =
   let tokens = tokenize(source)
   var parser = LuaParser(tokens: tokens, current: 0)
   let ast = parser.parseBlock()
@@ -25,15 +25,14 @@ proc runLua*(source: string): string =
   compiler.compile(ast, chunk, 1)
   chunk.writeChunk(uint8(opReturn), 1)
   chunk.writeChunk(0'u8, 1)
-
-  var vm = newVM()
+  var vm = newVM(false,moduleFlags)
   vm.output = newStringStream()
   interpret(vm, chunk)
   result = StringStream(vm.output).data
 
 ## Same as runLua, but hands back the VM afterward too, for tests that need
 ## to inspect state beyond stdout (e.g. confirming a global got set).
-proc runLuaVM*(source: string): (string, VM) =
+proc runLuaVM*(source: string,moduleFlags:set[ModuleFlags] = ALLMODULES): (string, VM) =
   let tokens = tokenize(source)
   var parser = LuaParser(tokens: tokens, current: 0)
   let ast = parser.parseBlock()
@@ -44,7 +43,7 @@ proc runLuaVM*(source: string): (string, VM) =
   chunk.writeChunk(uint8(opReturn), 1)
   chunk.writeChunk(0'u8, 1)
 
-  var vm = newVM()
+  var vm = newVM(false,moduleFlags)
   vm.output = newStringStream()
   interpret(vm, chunk)
   result = (StringStream(vm.output).data, vm)

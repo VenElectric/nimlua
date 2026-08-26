@@ -1,6 +1,6 @@
 import std/unittest
 import helpers/testutils
-import ../src/lerror
+import ../src/lerror,../src/ltypes
 
 suite "process.getenv":
   test "a variable that almost certainly exists returns a string":
@@ -10,9 +10,9 @@ suite "process.getenv":
     check runLua("""print(process.getenv("THIS_VAR_SHOULD_NOT_EXIST_98765"))""") == "nil\n"
 
 suite "process.execute (sandboxed by default)":
-  test "raises because allowExecute defaults to false":
+  test "raises because mProcess not included in openModules bitflag":
     expect LuaRuntimeError:
-      discard runLua("""process.execute("echo hi")""")
+      discard runLua("""process.execute("echo hi")""",ALLMODULES - {mProcess})
 
   # NOTE: nothing here confirms execute actually WORKS once enabled --
   # runLua's harness has no way to flip vm.processCaps before interpret()

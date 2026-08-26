@@ -90,6 +90,10 @@ proc disassembleChunk*(chunk: Chunk, name: string = "Unknown") =
       let slot = int(chunk.code[i])
       debug "    upvalue slot: ", slot
       inc(i)
+    of opMarkClose:
+      let slot = int(chunk.code[i])
+      debug "    slot: ", slot
+      inc(i)
     of opNewTable, opAdd, opSubtract, opMultiply, opDivide,
          opGetTable, opSetTable, opPop, opCloseUpvalue, opFloorDiv,
              opModulo,

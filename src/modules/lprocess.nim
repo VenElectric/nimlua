@@ -25,8 +25,6 @@ proc luaExit(args: varargs[LuaValue]): seq[LuaValue] =
   raise e
 
 proc luaExecute(vm: var VM, args: varargs[LuaValue]): seq[LuaValue] =
-  if not vm.processCaps.allowExecute:
-    raise newException(LuaRuntimeError, "process.execute is disabled in this sandbox")
   if args.len == 0:
     return @[newLuaBool(true)]   # no-arg execute just reports whether a shell exists
   if not isString(args[0]):

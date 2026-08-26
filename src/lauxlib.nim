@@ -29,7 +29,9 @@ proc createGlobalTable*(vm: var VM) =
   gMT.tval[MTINDEX] = newNimFnVM(globalIndex)
   gMT.tval[MTNEWINDEX] = newNimFnVM(globalNewindex)
   gMT.tval[MTPAIRS] = newNimFnVM(gPairs)
+  gMT.tval[MTMETA] = newLuaBool(false)
   G.mt = gMT
+  G.internal = true
   vm.globals["_G"] = G
   vm.globals["_VERSION"] = newLuaString("Lua 5.5")
 
@@ -38,13 +40,13 @@ proc interpret*(vm: var VM, chunk: var Chunk) =
     vm.output = newFileStream(stdout)
   vm.stack = LuaStack(values: @[])
   vm.frames = @[]
+  vm.createGlobalTable()
   vm.newTypeKindLib()
   vm.openCore()
   vm.openTable()
   vm.openFile()
   vm.openMath()
   vm.openPackage()
-  vm.createGlobalTable()
   vm.openProcess()
   vm.openTime()
   vm.openDir()
@@ -52,6 +54,8 @@ proc interpret*(vm: var VM, chunk: var Chunk) =
   vm.openString()
   vm.openCoroutine()
   vm.openUnicode()
+  vm.openJson()
+  vm.openNet()
 
   let mainVal = newLuaClosure("<main>", 0, chunk)
   vm.stack.add(wrapLuaClosure(mainVal))   # slot 0: the closure itself

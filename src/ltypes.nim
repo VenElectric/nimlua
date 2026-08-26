@@ -3,8 +3,35 @@ from std/sets import HashSet
 from std/streams import Stream
 
 type
+  ModuleFlags* = enum
+    mCore,
+    mTable,
+    mFile,
+    mMath,
+    mPackage,
+    mProcess,
+    mTime,
+    mDir,
+    mSet,
+    mString,
+    mCoro,
+    mUnicode,
+    mJson,
+    mNet
   CoroutineStatus* = enum
     csSuspended, csRunning, csNormal, csDead
+  LuaKind* = enum
+    ltNil = "nil",
+    ltBool = "bool",
+    ltNumber = "number",
+    ltInteger = "integer",
+    ltString = "string",
+    ltTable = "table",
+    ltNativeFn = "nim function",
+    ltClosure = "lua function",
+    ltNativeFnVM = "nim function"
+    ltUserData = "user data"
+    ltThread = "thread"
   ValueAttribute* = enum
     laConst,
     laClose,
@@ -58,13 +85,19 @@ type
     opAdjust,
     opCloseValue,
     opSpreadVarargValues,
-    opMarkGlobalConst
+    opMarkGlobalConst,
+    opMarkClose
+
+const ALLMODULES* = {mCore,mTable,mFile,mMath,mPackage,mProcess,mTime,mDir,mSet,mString,mCoro,mUnicode,mJson,mNet}
 
 type
+  ToCloseSlot* = object
+    slot*: int      # frame-relative slot holding the <close> value
+    closed*: bool   
   LuaStack* = ref object
     values*: seq[LuaValue]
     openUpvalues*: seq[LuaUpvalue]
-  LuaCoroutine* = ref object of LuaUserData
+  LuaCoroutine* = ref object
     frames*: seq[CallFrame]
     stack*: LuaStack
     status*: CoroutineStatus
@@ -72,8 +105,10 @@ type
     hasStarted*: bool
     ownRunDepth*: int 
   ProcessCapabilities* = object
-    allowExecute*: bool   # d
-  LuaUserData* = ref object of RootObj
+    allowExecute*: bool 
+    allowNet*: bool
+  LuaUserDataObj* = object of RootObj
+  LuaUserData* = ref LuaUserDataObj
   LuaUpValue* = ref object
     isOpen*: bool
     stack*: LuaStack        # NEW: which stack `location` indexes into
@@ -92,17 +127,6 @@ type
     code*: seq[uint8]         # The flat array of instructions
     constants*: seq[LuaValue] # The pool of raw values (from Phase 1!)
     lines*: seq[int]
-  LuaKind* = enum
-    ltNil = "nil",
-    ltBool = "bool",
-    ltNumber = "number",
-    ltInteger = "integer",
-    ltString = "string",
-    ltTable = "table",
-    ltNativeFn = "nim function",
-    ltClosure = "lua function",
-    ltNativeFnVM = "nim function"
-    ltUserData = "user data"
   LuaFunction* = ref object
     name*: string
     arity*: int
@@ -119,11 +143,14 @@ type
     of ltNumber: nval*: float64
     of ltInteger: ival*: int64
     of ltString: sval*: string
-    of ltTable: tval*: LuaTable
+    of ltTable: 
+      tval*: LuaTable
+      internal*: bool
     of ltClosure: fnVal*: LuaClosure
     of ltNativeFn: nativeFn*: NativeFunc
     of ltNativeFnVM: nativeFnVM*: NativeFuncVM
     of ltUserData: ud*: LuaUserData
+    of ltThread: co*: LuaCoroutine
   Local* = object
     name*: string
     depth*: int
@@ -158,6 +185,7 @@ type
     ip*: int
     slotBase*: int
     vararg*: LuaValue
+    toClose*: seq[ToCloseSlot]
   VM* = object
     chunk*: Chunk
     stack*: LuaStack   # The evaluation stack
@@ -169,11 +197,12 @@ type
     metaDepth*: int
     lastError*: LuaValue
     output*: Stream
-    processCaps*: ProcessCapabilities
     yieldRequested*: bool
     yieldValues*: seq[LuaValue]
-    currentCoroutine*: LuaCoroutine   # nil means "the main thread"
+    currentCoroutine*: LuaValue  # nil means "the main thread"
     nestedRunDepth*: int   
+    openModules*: set[ModuleFlags]
+    stringMT*: LuaValue
 
 proc `[]`*(s:LuaStack,index:int): LuaValue = s.values[index]
 proc `[]=`*(s:var LuaStack,index:int,v:sink LuaValue) = s.values[index] = v

@@ -269,7 +269,9 @@ proc compile*(c: var Compiler, node: Node, chunk: var Chunk, line: int) =
       if laClose in node.attrs: c.locals[localIdx].isClosed = true
       chunk.writeChunk(uint8(opSetLocal), node.line)
       chunk.writeChunk(uint8(localIdx), node.line)
-
+      if laClose in node.attrs:
+        chunk.writeChunk(uint8(opMarkClose), node.line)
+        chunk.writeChunk(uint8(localIdx), node.line)
     elif laGlobal in node.attrs:
     # `global` ALWAYS routes through _ENV, ignoring any local/upvalue shadow
       c.resolveEnvSlot(chunk, node.line)
@@ -362,7 +364,9 @@ proc compile*(c: var Compiler, node: Node, chunk: var Chunk, line: int) =
           if laClose in attrs: c.locals[localIdx].isClosed = true
           chunk.writeChunk(uint8(opSetLocal), node.line)
           chunk.writeChunk(uint8(localIdx), node.line)
-
+          if laClose in attrs:
+            chunk.writeChunk(uint8(opMarkClose), node.line)
+            chunk.writeChunk(uint8(localIdx), node.line)
         elif laGlobal in attrs:
           c.resolveEnvSlot(chunk, node.line)
           let nameIdx = chunk.addConstant(newLuaString(varName))
@@ -588,7 +592,7 @@ proc compile*(c: var Compiler, node: Node, chunk: var Chunk, line: int) =
     # 1. Create a new empty table on the stack
     chunk.writeChunk(uint8(opNewTable), node.line)
 
-    var arrayIndex = 1.0
+    var arrayIndex:int64 = 1
     for i, field in node.tableFields:
       let isLast = (i == node.tableFields.high)
       if field.key == nil and field.val.kind == nkVararg and isLast:
@@ -601,9 +605,9 @@ proc compile*(c: var Compiler, node: Node, chunk: var Chunk, line: int) =
         c.compile(field.key, chunk, node.line)
       else:
         chunk.writeChunk(uint8(opConstant), node.line)
-        let constIdx = chunk.addConstant(newLuaNumber(arrayIndex))
+        let constIdx = chunk.addConstant(newLuaInteger(arrayIndex))
         chunk.writeChunk(constIdx, node.line)
-        arrayIndex += 1.0
+        inc(arrayIndex)
 
       c.compile(field.val, chunk, node.line)
       chunk.writeChunk(uint8(opSetTable), node.line)

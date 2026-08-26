@@ -1,12 +1,20 @@
 import std/[tables,streams,files,appdirs,paths,times,random,tempfiles]
 import ../ltypes, ../lvalue, ../lerror
 
-type LuaFileHandle* = ref object of LuaUserData
-  stream*: Stream
-  path*: string
-  isClosed*: bool
-  isStandard*: bool   # true for stdout/stderr/stdin -- protects the shared stream from :close()
-  deleteOnClose*: bool  
+type
+  LuaFileHandleObj = object of LuaUserDataObj
+    stream*: Stream
+    path*: string
+    isClosed*: bool
+    isStandard*: bool
+    deleteOnClose*: bool
+  LuaFileHandle* = ref LuaFileHandleObj
+
+proc `=destroy`(f: var LuaFileHandleObj) =
+  if not f.isClosed:
+    try: 
+      f.stream.close()
+    except: discard   # a destructor can't raise -- this really is best-effort  
 
 const FileModeNames = ["read", "write", "append", "readWriteExisting", "readWrite"]
 
@@ -126,6 +134,7 @@ proc newFileLib*(vm: var VM) =
   fileMT.tval[MTINDEX] = FileMethods
   fileMT.tval[MTCLOSE] = newNimFn(luaFileClose)
   fileMT.tval[MTTYPE] = newLuaString("file")
+  fileMT.tval[MTMETA] = newLuaBool(false)
 
   proc wrap(stream: Stream, path: string, isStandard: bool = false, deleteOnClose: bool = false): LuaValue =
     let handle = LuaFileHandle(stream: stream, path: path, isClosed: false,
@@ -138,7 +147,7 @@ proc newFileLib*(vm: var VM) =
       raise newException(LuaRuntimeError, "bad argument #1 to 'open' (string expected)")
     let path = args[0].sval
 
-    if not isInteger(args[1]) or not FileMode.tval.hasKey(args[1]):
+    if not isInteger(args[1]) or isLuaNil(enumGet(FileMode, args[1])):
       raise newException(LuaRuntimeError, "bad argument #2 to 'open' (FileMode.xxx expected)")
     let modeInt = args[1].ival
   

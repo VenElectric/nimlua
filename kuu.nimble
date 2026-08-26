@@ -5,9 +5,12 @@ author        = "venduplicate"
 description   = "A new awesome nimble package"
 license       = "MIT"
 srcDir        = "src"
-bin           = @["nimlua"]
+bin           = @["kuu"]
 
 
 # Dependencies
 
-requires "nim >= 2.0.4"
+requires "nim >= 2.0.4","puppy"
+
+before install:
+  echo "before install hook ran"

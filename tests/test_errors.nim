@@ -69,15 +69,15 @@ suite "pcall":
   
   test "vm.lastError does not leak across a nested pcall inside a metamethod handler":
     check runLua("""
-      local mt = {__index = function(t, k)
+    local mt = {__index = function(t, k)
       pcall(function() error("inner, already handled") end)
       return "handled"
-      end}
-      local x = setmetatable({}, mt)
-      print(x.anything)
-      local ok, err = pcall(function() return {} + {} end)
-      print(ok, err)
-      """) == "handled\nfalse\tCannot perform '+' on table and table\n"
+    end}
+    local x = setmetatable({}, mt)
+    print(x.anything)
+    local ok, err = pcall(function() return {} + {} end)
+    print(ok, err)
+    """) == "handled\nfalse\tline 7: Cannot perform '+' on table and table\n"
 
 suite "xpcall":
   test "handler receives and can transform the error value":

@@ -303,7 +303,14 @@ proc scanToken(vl): Token =
         return createToken(vl.lineNum, tkNumber, $value)
       else:
         dec vl.bufpos
-        let numStr = vl.parseWhile(Digits + {'.', 'e', 'E'})
+        var numStr = vl.parseWhile(Digits + {'.', 'e', 'E'})
+        if numStr.len > 0 and (numStr[^1] == 'e' or numStr[^1] == 'E'):
+          if vl.peek() == '+' or vl.peek() == '-':
+            numStr.add(vl.advance())   # consume the sign, if there is one
+          let exponentDigits = vl.parseWhile(Digits)
+          if exponentDigits.len == 0:
+            raise newException(LuaSyntaxError, "malformed number near '" & numStr & "'")
+          numStr.add(exponentDigits)
         return createToken(vl.lineNum, tkNumber, numStr)
     elif c.isAlphaAscii() or c == '_':
       dec vl.bufpos

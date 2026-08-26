@@ -1,5 +1,5 @@
 import std/[tables, sugar, streams]
-from strutils import parseFloat, parseInt
+from strutils import parseFloat, parseInt,startsWith
 import ../ltypes
 import ../lvalue
 import ../lutil
@@ -10,6 +10,8 @@ proc luaRawGet*(args: varargs[LuaValue]): seq[LuaValue] =
   if len(args) != 2:
     raise newException(LuaRuntimeError, "Incorrect number of arguments to 'rawget'. (table and key expected)")
   let tab = args[0]
+  if isInternal(tab):
+    raise newException(LuaRuntimeError,"Cannot use 'rawget' on an internal table")
   let index = args[1]
   if not isTable(tab):
     raise newException(LuaRuntimeError, "Bad argument #1 to 'rawget'. (table expected)")
@@ -19,6 +21,8 @@ proc luaRawSet*(args: varargs[LuaValue]): seq[LuaValue] =
   if len(args) != 3:
     raise newException(LuaRuntimeError, "Incorrect number of arguments to 'rawset'. (table, key, and value expected)")
   let tab = args[0]
+  if isInternal(tab):
+    raise newException(LuaRuntimeError,"Cannot use 'rawset' on an internal table")
   let index = args[1]
   let value = args[2]
   if not isTable(tab):
@@ -48,14 +52,25 @@ proc luaRawLen*(args: varargs[LuaValue]): seq[LuaValue] =
 
 proc luaRawType*(args: varargs[LuaValue]): seq[LuaValue] =
   if len(args) != 1:
-    raise newException(LuaRuntimeError, "Incorrect number of arguments to 'rawlen'. One value expected.")
+    raise newException(LuaRuntimeError, "Incorrect number of arguments to 'rawtype'. One value expected.")
   let v = args[0]
   result = @[newLuaString($v.kind)]
+
+proc luaGetMetatable*(args: varargs[LuaValue]): seq[LuaValue] =
+  if len(args) < 1 or not (isTable(args[0]) or isUserData(args[0])):
+    raise newException(LuaRuntimeError, "Bad argument #1 to 'getmetatable'. (table expected)")
+  let t = args[0]
+  if isNil(t.mt): return @[newLuaNil()]
+  if t.mt.tval.hasKey(MTMETA):
+    return @[t.mt.tval[MTMETA]]
+  return @[t.mt]
 
 proc luaSetMetatable*(args: varargs[LuaValue]): seq[LuaValue] =
   if len(args) < 1 or not (isTable(args[0]) or isUserData(args[0])):
     raise newException(LuaRuntimeError, "Bad argument #1 to 'setmetatable'. (table expected)")
   let t = args[0]
+  if not isNil(t.mt) and t.mt.tval.hasKey(MTMETA):
+    raise newException(LuaRuntimeError, "cannot change a protected metatable")
   if len(args) < 2 or args[1].kind == ltNil:
     t.mt = nil
   elif args[1].kind == ltTable:
@@ -63,12 +78,6 @@ proc luaSetMetatable*(args: varargs[LuaValue]): seq[LuaValue] =
   else:
     raise newException(LuaRuntimeError, "Bad argument #2 to 'setmetatable' (nil or table expected)")
   return @[t]
-
-proc luaGetMetatable*(args: varargs[LuaValue]): seq[LuaValue] =
-  if len(args) < 1 or not (isTable(args[0]) or isUserData(args[0])):
-    raise newException(LuaRuntimeError, "Bad argument #1 to 'getmetatable'. (table expected)")
-  if isNil(args[0].mt): return @[newLuaNil()]
-  return @[args[0].mt]
 
 proc luaPrint*(vm: var VM, args: varargs[LuaValue]): seq[LuaValue] =
   for i, arg in args:
@@ -149,10 +158,29 @@ proc luaToNumber*(args: varargs[LuaValue]): seq[LuaValue] =
 
   return @[luaUToNumber(args[0], base)]
 
-proc luaToString*(args: varargs[LuaValue]): seq[LuaValue] =
+proc luaToString*(vm: var VM, args: varargs[LuaValue]): seq[LuaValue] =
   if args.len == 0:
     raise newException(LuaRuntimeError, "Invalid # of arguments to 'tostring'. Expected one argument.")
-  return @[newLuaString($args[0])]
+  let v = args[0]
+
+  if not isNil(v.mt) and hasMetaKey(v, MTTOSTR):
+    let handler = v.mt.tval[MTTOSTR]
+    if handler.kind notin {ltClosure, ltNativeFn, ltNativeFnVM}:
+      raise newException(LuaRuntimeError, "'__tostring' must be a function")
+    let results = vm.callMetamethod(handler, 1, v)
+    if not isString(results[0]):
+      raise newException(LuaRuntimeError, "'__tostring' must return a string")
+    return @[results[0]]
+
+  # No __tostring -- fall back to the default representation, using __name
+  # only to relabel the leading "table"/"userdata" word, not replace the
+  # whole thing (matching real Lua: __name never hides the address).
+  let defaultStr = $v
+  if not isNil(v.mt) and hasMetaKey(v, MTNAME) and isString(v.mt.tval[MTNAME]):
+    let kindPrefix = $v.kind
+    if defaultStr.startsWith(kindPrefix):
+      return @[newLuaString(v.mt.tval[MTNAME].sval & defaultStr[kindPrefix.len .. ^1])]
+  return @[newLuaString(defaultStr)]
 
 proc luaType*(args: varargs[LuaValue]): seq[LuaValue] =
   if args.len == 0:
@@ -255,16 +283,16 @@ proc luaXPCall*(vm: var VM, args: varargs[LuaValue]): seq[LuaValue] =
 
 proc registerGC*(vm: var VM) =
   let GCOption = newLuaEnum(["collect", "count", "stop", "restart"])
-
+  
   let luaCollectGarbage = proc(args: varargs[LuaValue]): seq[LuaValue] =
-    var optName = "collect" # collectgarbage() with no args defaults to "collect", matching real Lua
-    if args.len >= 1:
-      if not isInteger(args[0]) or not GCOption.tval.hasKey(args[0]):
-        raise newException(LuaRuntimeError, "bad argument #1 to 'collectgarbage' (GCOption.xxx expected)")
-      optName = GCOption.tval[args[0]].sval # reverse lookup: int -> name string
-
+    if len(args) == 0 or not isInteger(args[0]): 
+      raise newException(LuaRuntimeError, "bad argument #1 to 'collectgarbage' (GCOption.xxx expected)")
+    var optName = enumGet(GCOption, args[0]) # collectgarbage() with no args defaults to "collect", matching real Lua
+    if isLuaNil(optName):
+      raise newException(LuaRuntimeError, "bad argument #1 to 'collectgarbage' (GCOption.xxx expected)")
+    
     when defined(gcOrc):
-      case optName
+      case optName.sval
       of "collect":
         GC_fullCollect()
         return @[newLuaInteger(0)]
@@ -303,6 +331,8 @@ proc newTypeKindLib*(vm: var VM) =
   let mt = newLuaTable()
   mt.tval[MTINDEX] = newNimFn(typeKindIndex)
   mt.tval[MTNEWINDEX] = newNimFn(typeKindNewindex)
+  mt.tval[MTMETA] = newLuaBool(false)
   TypeKind.mt = mt
-
+  TypeKind.internal = true
+  
   vm.globals["TypeKind"] = TypeKind

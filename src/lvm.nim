@@ -9,9 +9,9 @@ type UnopProc = proc(vm: var VM, r: LuaValue): LuaValue
 proc run*(vm: var VM, stopDepth: int = 0): int
 proc adjustResults*(vm: var VM, want: int)
 
-proc newVM*(): VM =
+proc newVM*(traceExec:bool,moduleFlags: set[ModuleFlags] = ALLMODULES): VM =
   # We pre-allocate a reasonable stack size to avoid constant memory reallocations
-  VM(stack: LuaStack(values:newSeqOfCap[LuaValue](256)))
+  VM(stack: LuaStack(values:newSeqOfCap[LuaValue](256)),openModules: moduleFlags,traceExecution: traceExec)
 
 proc push*(vm: var VM, value: LuaValue) =
   vm.stack.values.add(value)
@@ -329,18 +329,25 @@ proc adjustResults*(vm: var VM, want: int) =
   vm.lastReturnCount = want
 
 proc luaIndexGet*(vm: var VM, tblVal, key: LuaValue): LuaValue =
+  var mt: LuaValue = nil
+
   if tblVal.kind == ltTable:
     if tblVal.tval.hasKey(key):
       return tblVal.tval[key]
-  elif tblVal.kind != ltUserData:
+    mt = tblVal.mt
+  elif tblVal.kind == ltUserData:
+    mt = tblVal.mt
+  elif tblVal.kind == ltString:
+    mt = vm.stringMT
+  else:
     raise newException(LuaRuntimeError, "Attempt to index a " & $tblVal.kind & " value")
 
-  if not isNil(tblVal.mt):
+  if not isNil(mt):
     let idxKey = newLuaString("__index")
-    if tblVal.mt.tval.hasKey(idxKey):
+    if mt.tval.hasKey(idxKey):
       if vm.metaDepth >= MaxIndexDepth:
         raise newException(LuaRuntimeError, "'__index' chain too long; possible loop")
-      let handler = tblVal.mt.tval[idxKey]
+      let handler = mt.tval[idxKey]
       case handler.kind
       of ltTable:
         inc(vm.metaDepth)
@@ -412,223 +419,236 @@ proc luaIndexSet*(vm: var VM, tblVal, key, val: LuaValue) =
   if not isLuaNil(val):
     tblVal.tval[key] = val
 
+
 proc run*(vm: var VM, stopDepth: int = 0): int =
   inc(vm.nestedRunDepth)
   try:
     while vm.frames.len > stopDepth:
       var frame = vm.frames[^1]
+      let currentLine = frame.chunk.lines[frame.ip]
       let instruction = OpCode(vm.readByte())
 
-      vm.traceInstruction(frame.ip, instruction)
-      case instruction
-      of opPop:
-        discard vm.pop()
-      of opConstant:
-        let constIndex = vm.readByte()
-        let val = frame.chunk.constants[constIndex]
-        vm.push(val)
-      of opAdd:
-        vm.binop(luaAdd)
-      of opSubtract:
-        vm.binop(luaSub)
-      of opMultiply:
-        vm.binop(luaMul)
-      of opDivide:
-        vm.binop(luaDiv)
-      of opFloorDiv:
-        vm.binop(luaFloorDiv)
-      of opModulo:
-        vm.binop(luaMod)
-      of opExponent:
-        vm.binop(luaPow)
-      of opBitAnd:
-        vm.binop(luaBitAnd)
-      of opBitOr:
-        vm.binop(luaBitOr)
-      of opBitXor:
-        vm.binop(luaBitXor)
-      of opShl:
-        vm.binop(luaShl)
-      of opShr:
-        vm.binop(luaShr)
-      of opEquals:
-        vm.binop(luaEquals)
-      of opNotEqual:
-        vm.binop(luaNotEquals)
-      of opLess:
-        vm.binop(luaLess)
-      of opLessEqual:
-        vm.binop(luaLessEqual)
-      of opGreater:
-        vm.binop(luaGreater)
-      of opGreaterEqual:
-        vm.binop(luaGreaterEqual)
-      of opConcat:
-        vm.luaConcat()
-      of opNot:
-        vm.push(not vm.pop())
-      of opNegate:
-        let r = vm.pop()
-        if isInteger(r):
-          vm.push(newLuaInteger(-r.ival))
-        elif isNumber(r):
-          vm.push(newLuaNumber(-numVal(r)))
-        else:
-          vm.push(vm.unaryFallback(MTNEG, "-", r))
-      of opBitNot:
-        let r = vm.pop()
-        vm.push(vm.luaBitNot(r))
-      of opLen:
-        let r = vm.pop()
-        if r.kind in {ltTable, ltUserData} and not isNil(r.mt) and
-            r.mt.tval.hasKey(MTLEN):
-          vm.push(vm.callMetamethod(r.mt.tval[MTLEN], 1, r)[0])
-        elif isTable(r):
-          vm.push(newLuaInteger(len(r.tval)))
-        elif isString(r):
-          vm.push(newLuaInteger(len(r.sval)))
-        else:
-          vm.push(vm.unaryFallback(MTLEN, "#", r))
-      of opGetLocal:
-        let slot = vm.readByte()
-        vm.push(vm.stack[frame.slotBase + int(slot)])
-      of opSetLocal:
-        let slot = vm.readByte()
-        let idx = frame.slotBase + int(slot)
-        let val = vm.pop()
-        if idx >= vm.stack.values.len:
-          vm.stack.values.add(val) # first time this slot is created
-        else:
-          vm.stack[idx] = val
-      of opMarkGlobalConst:
-        let nameIdx = vm.readByte()
-        let name = frame.chunk.constants[nameIdx]
-        vm.globalConsts.incl(name.sval)
-      of opNewTable:
-        vm.stack.values.add(newLuaTable())
-      of opGetTable:
-        let key = vm.pop()
-        let tblVal = vm.pop()
-        vm.push(vm.luaIndexGet(tblVal, key))
-      of opSetTable:
-        let val = vm.pop()
-        let key = vm.pop()
-        let tblVal = vm.stack.values[^1]
-        if tblVal.kind notin {ltTable, ltUserData}:
-          raise newException(LuaRuntimeError, "Attempt to index a " &
-              $tblVal.kind & " value")
-        if key.kind == ltNil:
-          raise newException(LuaRuntimeError, "Table index is nil")
-        vm.luaIndexSet(tblVal, key, val)
-      of opCall:
-       let argCount = int(vm.readByte())
-       vm.performCall(argCount)
-       if vm.yieldRequested: return 0
-      of opCallSpread:
-       let prefixCount = int(vm.readByte())
-       vm.performCall(prefixCount + vm.lastReturnCount)
-       if vm.yieldRequested: return 0
-      of opReturn:
-        if vm.doReturn(frame, int(vm.readByte()), stopDepth): return 0
-      of opReturnSpread:
-        let prefixCount = int(vm.readByte())
-        if vm.doReturn(frame, prefixCount + vm.lastReturnCount,
-            stopDepth): return 0
-      of opJumpIfFalse:
-        let offset = vm.readShort()
-        let conditionVal = vm.peek(0) # Look at top of stack WITHOUT popping it
-        let isTruthy = not (conditionVal.kind == ltNil or (conditionVal.kind ==
-            ltBool and conditionVal.bval == false))
-        if not isTruthy:
-          # If it's false, we take the jump!
+      try:
+        vm.traceInstruction(frame.ip, instruction)
+        case instruction
+        of opPop:
+          discard vm.pop()
+        of opConstant:
+          let constIndex = vm.readByte()
+          let val = frame.chunk.constants[constIndex]
+          vm.push(val)
+        of opAdd:
+          vm.binop(luaAdd)
+        of opSubtract:
+          vm.binop(luaSub)
+        of opMultiply:
+          vm.binop(luaMul)
+        of opDivide:
+          vm.binop(luaDiv)
+        of opFloorDiv:
+          vm.binop(luaFloorDiv)
+        of opModulo:
+          vm.binop(luaMod)
+        of opExponent:
+          vm.binop(luaPow)
+        of opBitAnd:
+          vm.binop(luaBitAnd)
+        of opBitOr:
+          vm.binop(luaBitOr)
+        of opBitXor:
+          vm.binop(luaBitXor)
+        of opShl:
+          vm.binop(luaShl)
+        of opShr:
+          vm.binop(luaShr)
+        of opEquals:
+          vm.binop(luaEquals)
+        of opNotEqual:
+          vm.binop(luaNotEquals)
+        of opLess:
+          vm.binop(luaLess)
+        of opLessEqual:
+          vm.binop(luaLessEqual)
+        of opGreater:
+          vm.binop(luaGreater)
+        of opGreaterEqual:
+          vm.binop(luaGreaterEqual)
+        of opConcat:
+          vm.luaConcat()
+        of opNot:
+          vm.push(not vm.pop())
+        of opNegate:
+          let r = vm.pop()
+          if isInteger(r):
+            vm.push(newLuaInteger(-r.ival))
+          elif isNumber(r):
+            vm.push(newLuaNumber(-numVal(r)))
+          else:
+            vm.push(vm.unaryFallback(MTNEG, "-", r))
+        of opBitNot:
+          let r = vm.pop()
+          vm.push(vm.luaBitNot(r))
+        of opLen:
+          let r = vm.pop()
+          if r.kind in {ltTable, ltUserData} and not isNil(r.mt) and
+              r.mt.tval.hasKey(MTLEN):
+            vm.push(vm.callMetamethod(r.mt.tval[MTLEN], 1, r)[0])
+          elif isTable(r):
+            vm.push(newLuaInteger(len(r.tval)))
+          elif isString(r):
+            vm.push(newLuaInteger(len(r.sval)))
+          else:
+            vm.push(vm.unaryFallback(MTLEN, "#", r))
+        of opGetLocal:
+          let slot = vm.readByte()
+          vm.push(vm.stack[frame.slotBase + int(slot)])
+        of opSetLocal:
+          let slot = vm.readByte()
+          let idx = frame.slotBase + int(slot)
+          let val = vm.pop()
+          if idx >= vm.stack.values.len:
+            vm.stack.values.add(val) # first time this slot is created
+          else:
+            vm.stack[idx] = val
+        of opMarkGlobalConst:
+          let nameIdx = vm.readByte()
+          let name = frame.chunk.constants[nameIdx]
+          vm.globalConsts.incl(name.sval)
+        of opNewTable:
+          vm.stack.values.add(newLuaTable())
+        of opGetTable:
+          let key = vm.pop()
+          let tblVal = vm.pop()
+          vm.push(vm.luaIndexGet(tblVal, key))
+        of opSetTable:
+          let val = vm.pop()
+          let key = vm.pop()
+          let tblVal = vm.stack.values[^1]
+          if tblVal.kind notin {ltTable, ltUserData}:
+            raise newException(LuaRuntimeError, "Attempt to index a " &
+                $tblVal.kind & " value")
+          if key.kind == ltNil:
+            raise newException(LuaRuntimeError, "Table index is nil")
+          vm.luaIndexSet(tblVal, key, val)
+        of opCall:
+          let argCount = int(vm.readByte())
+          vm.performCall(argCount)
+          if vm.yieldRequested: return 0
+        of opCallSpread:
+          let prefixCount = int(vm.readByte())
+          vm.performCall(prefixCount + vm.lastReturnCount)
+          if vm.yieldRequested: return 0
+        of opReturn:
+          if vm.doReturn(frame, int(vm.readByte()), stopDepth): return 0
+        of opReturnSpread:
+          let prefixCount = int(vm.readByte())
+          if vm.doReturn(frame, prefixCount + vm.lastReturnCount,
+              stopDepth): return 0
+        of opJumpIfFalse:
+          let offset = vm.readShort()
+          let conditionVal = vm.peek(0) # Look at top of stack WITHOUT popping it
+          let isTruthy = not (conditionVal.kind == ltNil or (conditionVal.kind ==
+              ltBool and conditionVal.bval == false))
+          if not isTruthy:
+            # If it's false, we take the jump!
+            let frameCount = vm.frames.len
+            vm.frames[frameCount - 1].ip += int(offset)
+        of opJump:
+          let offset = vm.readShort()
           let frameCount = vm.frames.len
           vm.frames[frameCount - 1].ip += int(offset)
-      of opJump:
-        let offset = vm.readShort()
-        let frameCount = vm.frames.len
-        vm.frames[frameCount - 1].ip += int(offset)
-      of opGetUpvalue:
-       let slot = vm.readByte()
-       let uv = frame.closure.upvalues[int(slot)]
-       if uv.isOpen: vm.push(uv.stack[uv.location])
-       else: vm.push(uv.closed)
-      of opSetUpvalue:
-       let slot = vm.readByte()
-       let uv = frame.closure.upvalues[int(slot)]
-       let val = vm.pop()
-       if uv.isOpen: uv.stack.values[uv.location] = val
-       else: uv.closed = val
-      of opClosure:
-        let constIdx = vm.readByte()
-        # Retrieve the function prototype/template from the constant pool
-        let protoVal = frame.chunk.constants[int(constIdx)]
-        let protoClosure = protoVal.fnVal # Assumes ltClosure holds closureVal
+        of opGetUpvalue:
+          let slot = vm.readByte()
+          let uv = frame.closure.upvalues[int(slot)]
+          if uv.isOpen: vm.push(uv.stack[uv.location])
+          else: vm.push(uv.closed)
+        of opSetUpvalue:
+          let slot = vm.readByte()
+          let uv = frame.closure.upvalues[int(slot)]
+          let val = vm.pop()
+          if uv.isOpen: uv.stack.values[uv.location] = val
+          else: uv.closed = val
+        of opClosure:
+          let constIdx = vm.readByte()
+          # Retrieve the function prototype/template from the constant pool
+          let protoVal = frame.chunk.constants[int(constIdx)]
+          let protoClosure = protoVal.fnVal # Assumes ltClosure holds closureVal
 
-        # Create a new runtime closure instance sharing the function prototype
-        var runtimeClosure = LuaClosure(fn: protoClosure.fn, upvalues: @[])
+          # Create a new runtime closure instance sharing the function prototype
+          var runtimeClosure = LuaClosure(fn: protoClosure.fn, upvalues: @[])
 
-        # Read the upvalue metadata emitted right after opClosure in the bytecode
-        let upvalueCount = protoClosure.upvalues.len
-        for i in 0 ..< upvalueCount:
-          let isLocal = vm.readByte()
-          let index = vm.readByte()
+          # Read the upvalue metadata emitted right after opClosure in the bytecode
+          let upvalueCount = protoClosure.upvalues.len
+          for i in 0 ..< upvalueCount:
+            let isLocal = vm.readByte()
+            let index = vm.readByte()
 
-          if isLocal == 1:
-            # Capture a local variable from the current stack frame
-            let location = frame.slotBase + int(index)
-            runtimeClosure.upvalues.add(vm.captureUpvalue(location))
-          else:
-            # Pass down an existing upvalue from the enclosing closure
-            runtimeClosure.upvalues.add(frame.closure.upvalues[int(index)])
+            if isLocal == 1:
+              # Capture a local variable from the current stack frame
+              let location = frame.slotBase + int(index)
+              runtimeClosure.upvalues.add(vm.captureUpvalue(location))
+            else:
+              # Pass down an existing upvalue from the enclosing closure
+              runtimeClosure.upvalues.add(frame.closure.upvalues[int(index)])
 
-        vm.push(wrapLuaClosure(runtimeClosure))
-      of opCloseUpvalue:
-        vm.closeUpvalues(vm.stack.values.high)
-        discard vm.pop()
-      of opCloseValue:
-        let slot = int(vm.readByte())
-        let idx = frame.slotBase + slot
-        let val = vm.stack[idx]
-
-        if val.kind in {ltTable, ltUserData} and not isNil(val.mt):
-          if val.mt.tval.hasKey(MTCLOSE):
-            let handler = val.mt.tval[MTCLOSE]
-            if handler.kind in {ltClosure, ltNativeFn, ltNativeFnVM}:
-              let stopDepth = vm.frames.len
-              vm.stack.values.add(handler)
-              vm.stack.values.add(val)
-              vm.stack.values.add(newLuaNil())
-              vm.performCall(2)
-              discard vm.run(stopDepth)
-              vm.lastReturnCount = 0
-        vm.stack.values.setLen(idx)
-      of opVararg:
-        vm.push(frame.vararg)
-      of opSpreadVararg:
-        let startIdx = int(vm.readByte())
-        let tbl = vm.peek(0)
-        if tbl.kind != ltTable:
-          raise newException(LuaRuntimeError, "opSpreadVararg: expected table under construction")
-        let count = frame.vararg.tval.len
-        for i in 1 .. count:
-          let val = frame.vararg.tval[newLuaNumber(float64(i))]
-          tbl.tval[newLuaNumber(float64(startIdx + i - 1))] = val
-      of opSpreadVarargValues:
-        let count = frame.vararg.tval.len
-        for i in 1 .. count:
-          vm.push(frame.vararg.tval[newLuaNumber(float64(i))])
-        vm.lastReturnCount = count
-      of opLoop:
-        let offset = vm.readShort()
-        frame.ip -= int(offset)
-      of opAdjust:
-        vm.adjustResults(int(vm.readByte()))
-      of opGetMethod:
-        let nameIdx = vm.readByte()
-        let nameVal = frame.chunk.constants[nameIdx]
-        let receiver = vm.pop()
-        let methodFn = vm.luaIndexGet(receiver, nameVal)
-        vm.push(methodFn)
-        vm.push(receiver)
+          vm.push(wrapLuaClosure(runtimeClosure))
+        of opCloseUpvalue:
+          vm.closeUpvalues(vm.stack.values.high)
+          discard vm.pop()
+        of opCloseValue:
+          let slot = int(vm.readByte())
+          let idx = frame.slotBase + slot
+          let val = vm.stack[idx]
+          for i in 0 ..< frame.toClose.len:
+            if frame.toClose[i].slot == slot:
+              frame.toClose[i].closed = true
+          if val.kind in {ltTable, ltUserData} and not isNil(val.mt):
+            if val.mt.tval.hasKey(MTCLOSE):
+              let handler = val.mt.tval[MTCLOSE]
+              if handler.kind in {ltClosure, ltNativeFn, ltNativeFnVM}:
+                let stopDepth = vm.frames.len
+                vm.stack.values.add(handler)
+                vm.stack.values.add(val)
+                vm.stack.values.add(newLuaNil())
+                vm.performCall(2)
+                discard vm.run(stopDepth)
+                vm.lastReturnCount = 0
+          vm.stack.values.setLen(idx)
+        of opVararg:
+          vm.push(frame.vararg)
+        of opSpreadVararg:
+          let startIdx = int(vm.readByte())
+          let tbl = vm.peek(0)
+          if tbl.kind != ltTable:
+            raise newException(LuaRuntimeError, "opSpreadVararg: expected table under construction")
+          let count = frame.vararg.tval.len
+          for i in 1 .. count:
+            let val = frame.vararg.tval[newLuaNumber(float64(i))]
+            tbl.tval[newLuaNumber(float64(startIdx + i - 1))] = val
+        of opSpreadVarargValues:
+          let count = frame.vararg.tval.len
+          for i in 1 .. count:
+            vm.push(frame.vararg.tval[newLuaNumber(float64(i))])
+          vm.lastReturnCount = count
+        of opLoop:
+          let offset = vm.readShort()
+          frame.ip -= int(offset)
+        of opAdjust:
+          vm.adjustResults(int(vm.readByte()))
+        of opGetMethod:
+          let nameIdx = vm.readByte()
+          let nameVal = frame.chunk.constants[nameIdx]
+          let receiver = vm.pop()
+          let methodFn = vm.luaIndexGet(receiver, nameVal)
+          vm.push(methodFn)
+          vm.push(receiver)
+        of opMarkClose:
+          let slot = int(vm.readByte())
+          frame.toClose.add(ToCloseSlot(slot: slot, closed: false))
+      except LuaRuntimeError as e:
+        if e.line == 0:
+          e.line = currentLine
+          e.msg = "line " & $currentLine & ": " & e.msg
+        raise
   finally:
     dec(vm.nestedRunDepth)

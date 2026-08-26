@@ -9,3 +9,4 @@ src/lua54/testfiles
 .zed
 lua54
 test.lua
+luavm.log

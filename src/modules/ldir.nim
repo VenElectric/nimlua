@@ -1,7 +1,20 @@
-import std/[tables,dirs,paths,tempfiles]
+import std/[tables,dirs,paths,tempfiles,logging]
 import ../ltypes,../lvalue,../lerror,../lutil
 
 const PathKindNames = ["file", "dir", "linkToFile", "linkToDir"]
+
+type
+  LuaTempDirObj = object of LuaUserDataObj
+    path*: string
+    isRemoved*: bool
+  LuaTempDir* = ref LuaTempDirObj
+
+proc `=destroy`(t: var LuaTempDirObj) =
+  if not t.isRemoved:
+    try: removeDir(Path(t.path))
+    except OSError: discard
+    t.isRemoved = true
+    info "Removed temp dir"
 
 proc luaCreateDir(args: varargs[LuaValue]): seq[LuaValue] = 
   if len(args) == 1:
@@ -73,10 +86,6 @@ proc luaCopyDir(args:varargs[LuaValue]): seq[LuaValue] =
   else:
     raise newException(LuaRuntimeError,moduleArgNumErrorFmt("copyDir","two"))
 
-type LuaTempDir* = ref object of LuaUserData
-  path*: string
-  isRemoved*: bool
-
 proc asTempDir(v: LuaValue): LuaTempDir =
   if not isUserData(v) or v.ud.isNil or not (v.ud of LuaTempDir):
     raise newException(LuaRuntimeError, "bad argument (temp dir handle expected)")
@@ -134,10 +143,10 @@ proc newDirLib*(vm: var VM) =
     var entries: seq[(LuaValue, string)] = @[]
     for kind, path in walkDir(dPath):
       let kindVal = case kind
-        of pcFile: PathKind.tval[newLuaString("file")]
-        of pcDir: PathKind.tval[newLuaString("dir")]
-        of pcLinkToFile: PathKind.tval[newLuaString("linkToFile")]
-        of pcLinkToDir: PathKind.tval[newLuaString("linkToDir")]
+        of pcFile: enumGet(PathKind, newLuaString("file"))
+        of pcDir: enumGet(PathKind, newLuaString("dir"))
+        of pcLinkToFile: enumGet(PathKind, newLuaString("linkToFile"))
+        of pcLinkToDir: enumGet(PathKind, newLuaString("linkToDir"))
       entries.add((kindVal, $path))
 
     var idx = 0
@@ -156,6 +165,7 @@ proc newDirLib*(vm: var VM) =
   tempDirMT.tval[MTINDEX] = TempDirMethods
   tempDirMT.tval[MTCLOSE] = newNimFn(luaTempDirRemove)   # <close> reuses the same removal logic
   tempDirMT.tval[MTTYPE] = newLuaString("tempdir")
+  tempDirMT.tval[MTMETA] = newLuaBool(false)
 
   let luaTempScoped = proc(args: varargs[LuaValue]): seq[LuaValue] =
   # same argument validation as luaCreateTempDir

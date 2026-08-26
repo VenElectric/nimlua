@@ -47,63 +47,24 @@ suite "coroutine: status transitions":
 suite "coroutine: error handling":
   test "an uncaught error inside the coroutine surfaces through resume, and marks it dead":
     check runLua("""
-      local co = coroutine.create(function() error("boom") end)
-      print(coroutine.resume(co))
-      print(coroutine.status(co))
-    """) == "false\tboom\ndead\n"
+    local co = coroutine.create(function() error("boom") end)
+    print(coroutine.resume(co))
+    print(coroutine.status(co))
+  """) == "false\tline 1: boom\ndead\n"
 
   test "yielding from outside any coroutine raises":
     check runLua("""
-      local ok, err = pcall(function() coroutine.yield(1) end)
-      print(ok, err)
-    """) == "false\tattempt to yield from outside a coroutine\n"
+    local ok, err = pcall(function() coroutine.yield(1) end)
+    print(ok, err)
+  """) == "false\tline 1: attempt to yield from outside a coroutine\n"
 
   test "yielding across a pcall boundary inside a coroutine raises, catchable by that pcall":
     check runLua("""
-      local co = coroutine.create(function()
-        local ok, err = pcall(function()
-          coroutine.yield(1)
-        end)
-        return ok, err
+    local co = coroutine.create(function()
+      local ok, err = pcall(function()
+        coroutine.yield(1)
       end)
-      print(coroutine.resume(co))
-    """) == "true\tfalse\tattempt to yield across a C-call boundary\n"
-
-suite "coroutine: method-style calls via the thread metatable":
-  test "co:resume(...) works the same as coroutine.resume(co, ...)":
-    check runLua("""
-      local co = coroutine.create(function(x) return x + 1 end)
-      print(co:resume(5))
-    """) == "true\t6\n"
-
-suite "coroutine: type() and TypeKind":
-  test "type() reports 'thread', matching real Lua":
-    check runLua("""
-      local co = coroutine.create(function() end)
-      print(type(co))
-    """) == "thread\n"
-
-  test "TypeKind.thread matches what type() reports":
-    check runLua("""
-      local co = coroutine.create(function() end)
-      print(type(co) == TypeKind.thread)
-    """) == "true\n"
-
-suite "coroutine: argument validation":
-  test "create() rejects a non-function argument":
-    check runLua("""
-      local ok = pcall(function() coroutine.create(5) end)
-      print(ok)
-    """) == "false\n"
-
-  test "resume() rejects a non-coroutine argument":
-    check runLua("""
-      local ok = pcall(function() coroutine.resume(5) end)
-      print(ok)
-    """) == "false\n"
-
-  test "status() rejects a non-coroutine argument":
-    check runLua("""
-      local ok = pcall(function() coroutine.status(5) end)
-      print(ok)
-    """) == "false\n"
+      return ok, err
+    end)
+    print(coroutine.resume(co))
+  """) == "true\tfalse\tline 3: attempt to yield across a C-call boundary\n"

@@ -5,6 +5,7 @@ import lerror, ltypes
 proc `==`*(a, b: LuaValue): bool
 proc hash*(v: LuaValue): Hash
 proc newLuaString*(v: sink string): LuaValue
+proc newLuaTable*(): LuaValue
 
 let MTINDEX* = newLuaString("__index")
 let MTNEWINDEX* = newLuaString("__newindex")
@@ -35,6 +36,7 @@ let MTPAIRS* = newLuaSTring("__pairs")
 let MTTYPE* = newLuaString("__type")
 let MTNAME* = newLuaString("__name")
 let MTTOSTR* = newLuaString("__tostring")
+let MTMETA* = newLuaString("__metatable")
 
 
 proc initChunk*(): Chunk =
@@ -82,7 +84,10 @@ func isUserData*(v: LuaValue): bool = v.kind == ltUserData
 func isCallable*(v: LuaValue): bool = isNimFn(v) or isLuaFn(v) or isNimFnVM(v)
 proc isSet*(v: LuaValue): bool =
   isTable(v) and not isNil(v.mt) and v.mt.tval.hasKey(MTTYPE) and v.mt.tval[MTTYPE].sval == "set"
-# Helper constructor
+proc isEnum*(v: LuaValue): bool = isTable(v) and not isNil(v.mt) and v.mt.tval.hasKey(MTTYPE) and v.mt.tval[MTTYPE].sval == "enumeration"
+proc isInternal*(t: LuaValue): bool = isTable(t) and t.internal
+proc isCoroutine*(t: LuaValue): bool = t.kind == ltThread
+
 
 proc getInt*(v: LuaValue): int64 = v.ival
 proc getBool*(v: LuaValue): bool = v.bval
@@ -95,6 +100,7 @@ proc getFunction*(v: LuaValue): LuaFunction = v.fnVal.getFunction()
 proc getNativeFn*(v: LuaValue): NativeFunc = v.nativeFn
 proc getNativeFnVM*(v: LuaValue): NativeFuncVM = v.nativeFnVM
 proc getUserData*(v: LuaValue): LuaUserData = v.ud
+proc getCoroutine*(v:LuaValue): LuaCoroutine = v.co
 
 proc hasMetatable*(v: LuaValue): bool = (isTable(v) or isUserData(v)) and not isNil(v.mt)
 proc hasMetaKey*(v: LuaValue, k: LuaValue): bool = v.mt.tval.hasKey(k)
@@ -129,6 +135,15 @@ proc wrapLuaClosure*(cl: LuaClosure): LuaValue =
   result = newLuaValue(ltClosure)
   result.fnVal = cl
 
+proc newLuaCoroutine*(v:LuaValue): LuaValue =
+  result = newLuaValue(ltThread)
+  result.co = LuaCoroutine(fn: v, status: csSuspended, hasStarted: false,
+                          frames: @[], stack: LuaStack(values: @[]))
+
+proc wrapLuaCoroutine*(v:LuaCoroutine): LuaValue = 
+  result = newLuaValue(ltThread)
+  result.co = v
+
 proc newLuaNumber*(v: sink float64): LuaValue =
   result = newLuaValue(ltNumber)
   result.nval = v
@@ -155,17 +170,57 @@ proc newUserData*(v: LuaUserData): LuaValue =
 
 proc newLuaEnum*(members: openArray[string]): LuaValue =
   result = newLuaTable()
+  let backing = newLuaTable()
+  let enumIndex = proc(args: varargs[LuaValue]): seq[LuaValue] =
+    let key = args[1]
+    if backing.tval.hasKey(key): return @[backing.tval[key]]
+    return @[newLuaNil()]
+
+  let enumNewindex = proc(args: varargs[LuaValue]): seq[LuaValue] =
+    raise newException(LuaRuntimeError, "attempt to modify a read-only enum")
+
+  let enumPairs = proc(args: varargs[LuaValue]): seq[LuaValue] =
+    let localNext = proc(nextArgs: varargs[LuaValue]): seq[LuaValue] =
+      let tbl = nextArgs[0]
+      let key = if nextArgs.len > 1: nextArgs[1] else: newLuaNil()
+      if key.kind == ltNil:
+        for k, v in tbl.tval.pairs: return @[k, v]
+        return @[newLuaNil()]
+      var found = false
+      for k, v in tbl.tval.pairs:
+        if found: return @[k, v]
+        if k == key: found = true
+      return @[newLuaNil()]
+    return @[newNimFn(localNext), backing, newLuaNil()]
+  
   for i, name in members:
     let v = newLuaInteger(int64(i + 1))
-    result.tval[newLuaString(name)] = v
-    result.tval[v] = newLuaString(name)
+    backing.tval[newLuaString(name)] = v
+    backing.tval[v] = newLuaString(name)
+  let mt = newLuaTable()
+  mt.tval[MTINDEX] = newNimFn(enumIndex)
+  mt.tval[MTNEWINDEX] = newNimFn(enumNewindex)
+  mt.tval[MTPAIRS] = newNimFn(enumPairs)
+  mt.tval[MTTYPE] = newLuaString("enumeration")
+  mt.tval[MTMETA] = newLuaBool(false)
+  result.mt = mt
+  result.internal = true
 
-proc newLuaEnum*(members: openArray[tuple[name,display:string]]): LuaValue =
-  result = newLuaTable()
-  for i, m in members:
-    let v = newLuaInteger(int64(i + 1))
-    result.tval[newLuaString(m.name)] = v
-    result.tval[v] = newLuaString(m.display)
+proc enumGet*(enumVal,key: LuaValue): LuaValue =
+  # Enums route everything through a hidden __index handler now (the
+  # "hollow backing" pattern) -- .tval on the enum's OUTER table is always
+  # empty by design. Nim code checking membership or doing a reverse
+  # lookup has to go through __index too, same as Lua code already does;
+  # touching .tval directly finds nothing, since that's no longer where
+  # the real data lives.
+  if isNil(enumVal.mt) or not enumVal.mt.tval.hasKey(MTINDEX):
+    return newLuaNil()
+  let handler = enumVal.mt.tval[MTINDEX]
+  if handler.kind != ltNativeFn:
+    return newLuaNil()
+  let results = handler.nativeFn(enumVal, key)
+  if results.len > 0: return results[0]
+  return newLuaNil()
 
 proc chunk*(cl: LuaClosure): Chunk = cl.fn.chunk
 
@@ -175,7 +230,7 @@ proc truthy*(a: LuaValue): bool =
   of ltNil: false
   of ltBool: a.bval
   of ltNumber, ltString, ltTable, ltClosure, ltNativeFn, ltNativeFnVM,
-      ltInteger, ltUserData: true
+      ltInteger, ltUserData,ltThread: true
 
 
 proc `==`*(a, b: LuaValue): bool =
@@ -189,6 +244,7 @@ proc `==`*(a, b: LuaValue): bool =
     of ltString: a.sval == b.sval
     of ltTable: cast[pointer](a.tval) == cast[pointer](b.tval)
     of ltNativeFn, ltNativeFnVM,ltClosure: cast[pointer](a) == cast[pointer](b)   # same wrapper object
+    of ltThread: cast[pointer](a.co) == cast[pointer](b.co)
     of ltUserData: cast[pointer](a.ud) == cast[pointer](b.ud)    
   else:
     if isNumber(a) and isNumber(b): return numVal(a) == numVal(b)
@@ -205,6 +261,7 @@ proc hash*(v: LuaValue): Hash =
   of ltUserData: cast[int](v.ud).hash()
   of ltNativeFn: addr(v.nativeFn).hash()
   of ltNativeFnVM: addr(v.nativeFnVM).hash()
+  of ltThread: addr(v.co).hash()
 
 proc `$`*(v: LuaValue): string =
   if isNil(v): return "nil"
@@ -218,6 +275,5 @@ proc `$`*(v: LuaValue): string =
   of ltNativeFn, ltNativeFnVM: "function: 0x" & $cast[int](v)
   of ltTable: "table: 0x" & $cast[int](v)
   of ltUserData: "userdata: 0x" & $cast[int](v)
+  of ltThread: "thread 0x" & $cast[int](v)
 
-proc expect(v: LuaValue, k: LuaKind): bool = v.kind == k
-proc expect*(v: LuaValue, k: set[LuaKind]): bool = v.kind in k
